@@ -33,7 +33,7 @@ function onDeviceReady(){
 
 
 function codBarras(){
-	window.plugins.barcodeScanner.scan( function(result) {
+	plugins.barcodeScanner.scan( function(result) {
 			alert("We got a barcode\n" +
 					"Result: " + result.text + "\n" +
 					"Format: " + result.format + "\n" +
