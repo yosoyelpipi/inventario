@@ -35,6 +35,10 @@
       #genInventario{display:none;}
       #tomaInventario{display:none;}
       #depInventario{display:none;}
+      #configWS{display:none;}
+      #helpNow{display:none;}
+      #probarWS{display:none;}
+      #conectando{display:none;}
     </style>
   </head>
 
@@ -80,8 +84,8 @@
       </div>
       <center><img src="img/error.png" width="200px"></center><hr>
       <div class="alert alert-danger" role="alert" id="mgnalert"></div>
-      <p><a onclick="scanear();" href="#">Escanear</a></p>
-      <!--<p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>-->
+      <center><a class="btn btn-default" href="javascript:configWS()" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configurar WebService</a></center>
+      <!--<p><a onclick="scanear();" href="#">Escanear</a></p>-->
     </div>
 <!--FIN Page Error WS -->    
 
@@ -90,10 +94,12 @@
       <div class="page-header">
         <h1>Bienvenido</h1>
       </div>
-      <p class="lead">Ya tenés configurado el WS</p>
+      <p class="lead">Tenemos todo listo para comenzar a trabajar</p>
       <!--<p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>-->
-    </div>
-<!--FIN INDEX Bienvenida-->
+      <button type="button" onClick="genInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Generación de inventario</button>
+      <button type="button" onClick="tomaInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Toma de inventario</button>
+      <button type="button" onClick="depInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depuración</button>      
+    </div><!--FIN INDEX Bienvenida-->
 
 
 <!-- GENERACION DE TOMA DE INVENTARIO -->
@@ -102,8 +108,12 @@
         <h1>Generación Toma de inventario</h1>
       </div>
       <p class="lead">Selecciona el depósito a inventariar</p>
-    </div>
-<!-- FIN GENERACION DE TOMA DE INVENTARIO -->
+      <button type="button" class="btn btn-primary btn-lg btn-block" id="actInventario"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Actualizar toma de inventario</button>
+      <hr>
+      <div class="list-group" id="depositos">
+      <!-- Lo completo desde Javascript -->  
+      </div>          
+    </div><!-- FIN GENERACION DE TOMA DE INVENTARIO -->
 
 
 <!-- TOMA DE INVENTARIO -->
@@ -112,8 +122,8 @@
         <h1>Bienvenido...comencemos</h1>
       </div>
       <p class="lead">Elegí...vas a inventariar por código de barras o por artículos.</p>
-    </div>
-<!-- FIN TOMA DE INVENTARIO -->
+
+    </div><!-- FIN TOMA DE INVENTARIO -->
 
 
 <!-- DEPURAR TOMA DE INVENTARIO -->
@@ -122,9 +132,91 @@
         <h1>Depuración de inventario</h1>
       </div>
       <p class="lead">Vamos a borrar los inventarios generados...</p>
-    </div>
-<!-- FIN DEPURAR TOMA DE INVENTARIO -->
+    </div><!-- FIN DEPURAR TOMA DE INVENTARIO -->
 
+<!-- CONFIGURAR WS -->
+    <div class="container" id="configWS">
+      <div class="page-header">
+        <h1>Configuración del Web Service</h1>
+      </div>
+      <p class="lead">Vamos a configurar por única vez los parámetros de conexión del WS</p>
+      
+      <div id="config">
+          <form method="POST" onsubmit="return submitForm()">
+            <div class="form-group" id="ws">
+            <label for="ws"><small>Web Service</small></label>
+            <input type="text" class="form-control" id="ws" name="ws" value="http://Servidor/ITSWS/ItsCliSvrWS.asmx?WSDL">
+            </div>
+            <div class="form-group" id="bd">
+            <label for="bd"><small>Base de datos</small></label>
+            <input type="text" class="form-control" id="bd" name="bd" placeholder="BASEDEMO">
+            </div>
+            <div class="form-group" id="user">
+            <label for="user"><small>Usuario</small></label>
+            <input type="text" class="form-control" id="user" name="user" placeholder="Usuario">
+            </div>
+            <div class="form-group" id="pass">
+            <label for="pass"><small>Password</small></label>
+            <input type="password" class="form-control" id="pass" name="pass" placeholder="123456">
+            </div>
+      
+            <button type="submit" id="b_guardar" class="btn btn-default"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span> <small>Guardar</small></button>
+          </form>	
+          <hr>
+          <a class="btn btn-default btn-lg btn-block" href="index.html" role="button"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span> Volver</a>
+      </div>           
+    </div><!-- FIN CONFIGURAR WS-->
+
+
+<!-- PROBAR WS -->
+    <div class="container" id="probarWS">
+      <div class="page-header">
+        <h1>Configuración del Web Service</h1>
+      </div>
+      <p class="lead">Mediantes estos datos de conexión estamos transfiriendo los datos.</p>
+      
+      <div id="config">
+          <form>
+            <div class="form-group" id="defws">
+            <!-- Lo completo por javascript -->
+            </div>
+            <div class="form-group" id="defdb">
+            <!-- Lo completo por javascript -->
+            </div>
+            <div class="form-group" id="defuser">
+            <!-- Lo completo por javascript -->
+            </div>
+            <div class="form-group" id="defpass">
+            <!-- Lo completo por javascript -->
+            </div>
+
+            <button type="button" class="btn btn-danger" onClick="Cleaner()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Limpiar</button>
+          </form>	
+          <hr>
+          <div id="testeer">
+            <center>
+              <div class="btn-group" role="group" aria-label="..." style="margin-left:0px; margin-right:0px; margin-top:0px;">
+                <button type="button" id="conexion" class="btn btn-default"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Conexión</button>
+                <button type="button" id="testlogin" class="btn btn-default"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</button>
+                <button type="button" id="redmovil"  onclick="checkConnection()" class="btn btn-default"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Red móvil</button>
+              </div>				
+              <div id="conectando"><br><img src="img/loading.gif" width="64px"><br></div>
+            </center>
+          </div>          
+          <hr>
+          <a class="btn btn-default btn-lg btn-block" href="index.html" role="button"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span> Volver</a>
+      </div>           
+    </div><!-- FIN PROBAR WS-->
+    
+ <!-- DEPURAR TOMA DE INVENTARIO -->
+    <div class="container" id="helpNow">
+      <div class="page-header">
+        <h1>Ayuda</h1>
+      </div>
+      <p class="lead">Centro de soporte...</p>
+    </div><!-- FIN DEPURAR TOMA DE INVENTARIO -->
+    
+<br><br>
     <footer class="footer">
       <div class="container">
         <p class="text-muted">Itris Software - Toma de inventario 1.0</p>
