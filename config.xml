@@ -2,7 +2,7 @@
 <widget id="com.inventarioits.ar" version="2.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Inventario</name>
     <description>
-       Barcode Prueba para Itris Software...
+       Barcode Prueba para Itris Software...by lc
     </description>
     <author email="lcondori@itris.com.ar" href="http://www.itris.com.ar">
         Leo Condori
