@@ -17,6 +17,11 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
     onDeviceReady: function() {
+	
+	//Inicializo las notificaciones Push
+	if(PushbotsPlugin.isAndroid()){
+		PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "AIzaSyC2aCd647_5nNPTWBMAZId5foB12cD6KmU");
+	}	
         //scanear();
        //Habilita la función del botón atrás.
 	   document.addEventListener("backbutton", onBackKeyDown, false);	 
@@ -252,16 +257,18 @@ function Cleaner(){
                     var f = Response.Data[x]["FECHA"];
                     var d = Response.Data[x]["FK_ERP_DEPOSITOS"];
                     var de = Response.Data[x]["DES_DEP"];
-
+					
+					$("#conectando").hide();
                     $('#depositos').append('<button type="button" onClick="defDeposito('+f+','+d+',\''+de+'\')" class="list-group-item"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> '+ Response.Data[x]["DES_DEP"] +'</button>');
                 }
             }
     }
-    
+ 
+//Agregar el depósito activo.    
 function defDeposito(f,d,de){
-    alert (f);
-    alert (d);
-    alert (de);
+    alert(f);
+    alert(d);
+    alert(de);
 }        
     
 /* Testo de conexión móvil */
