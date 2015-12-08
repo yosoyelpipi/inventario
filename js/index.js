@@ -20,7 +20,7 @@ var app = {
 	
 	//Inicializo las notificaciones Push
 	if(PushbotsPlugin.isAndroid()){
-		PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "AIzaSyC2aCd647_5nNPTWBMAZId5foB12cD6KmU");
+		PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "902461928096");
 	}	
         //scanear();
        //Habilita la función del botón atrás.
