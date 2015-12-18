@@ -412,8 +412,14 @@ function crearEmpresa(tx){
 						console.log('Fecha de última actualización:' + Response.ItsGetDate);						
 						//$("#instala").fadeOut(10000);						
 					}else{
+						
+						
 						fua_cli = window.localStorage.getItem("fua_cli");
-			if( confirm("No hay artículos nuevss para centralizar, la fecha y hora que se ejecutó por última vez es " + fua_cli + ". De todas maneras ¿Desea forzar la centralización? se perderán todas las empresas guardadas.") )
+                        showAlert();						
+						
+						
+						
+			/*if( confirm("No hay artículos nuevos para centralizar, la fecha y hora que se ejecutó por última vez es " + fua_cli + ". De todas maneras ¿Desea forzar la centralización? se perderán todas las empresas guardadas.") )
             {
 			//Borro los datos de la tabla.
 			var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
@@ -426,7 +432,7 @@ function crearEmpresa(tx){
 			//Todo fue maravilloso  
               alert('¡Excelente! ahora volvé a centralizar las empresas.');
 				//location.reload();			  
-            }
+            }*/
 					
 						//$("#instala").html('<span class="label label-info">Tenés el maestro de empresas actualizado</span><br>');
 						$("#instala").fadeOut(9000);
@@ -445,6 +451,21 @@ function successCB(){
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
 }		
 
+
+// alert dialog dismissed
+        function alertDismissed() {
+            // do something
+        }
+
+
+	function showAlert() {
+        navigator.notification.alert(
+            'You are the winner!',  // message
+            alertDismissed,         // callback
+            'Game Over',            // title
+            'Done'                  // buttonName
+        );
+    }
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
     {
