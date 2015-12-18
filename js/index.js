@@ -72,6 +72,8 @@ function scanear(){
             var codigoQR=result.text;
             //Introducimos esa variable en el campo 
             $('#contado').append(codigoQR);
+			//Llamo nuevamente al léctor de código de barras.
+			loop();
         }, 
         //Si no, ejecuta la función error.
         function (error) {
@@ -80,6 +82,9 @@ function scanear(){
     );
 };
 
+function loop(){
+	scanear();
+}
 //Verifico si el usuario definió o no el WS
 function verificarWS(c,m){
     ws = window.localStorage.getItem("ws");
@@ -117,10 +122,8 @@ function tomaInventario(){
 		$('#TomaDeInventario').html('<div class="alert alert-danger" role="alert">Oh snap! No tenés definido aún ningún depósito, andá a la generación de inventario y seleccioná un depósito. De lo contrario no vas a poder realizarlo.</div>');
 		$('#DesDepo').html('<span class="label label-danger" >Sin definir</span>');
 	}else{
-		$('#TomaDeInventario').html('<div class="btn-group btn-group-lg" role="group" aria-label="..."> ' +
-										'<button type="button" onClick="scanear()" class="btn btn-primary"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Código de Barras</button> ' +
-										'<button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>' +
-									'</div>');
+		$('#TomaDeInventario').html('<button type="button" onClick="scanear()" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Por código de barras</button>' +
+									'<button type="button" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>');
 		$('#DesDepo').html('<span class="label label-success" >' + desDepo + '</span>');
 	}
 	
