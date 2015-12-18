@@ -468,7 +468,7 @@ function successArt(){
             'No hay artículos nuevos para actualizar la aplicación. La fecha y hora que se ejecutó por última vez fue ' + fua_cli + '. ¿De todas maneras deseas forzar la centralización?',  // message
             onConfirm, // callback
             'Centralizador dice:', // title
-            'Forzar, Cancelar' // buttonName
+            ['Forzar', 'Cancelar'] // buttonName
         );
     }
 	
@@ -481,8 +481,7 @@ function resetArticulos(){
 	
 	//Actualizo la fecha de última actualización.
 	  window.localStorage.setItem("fua_cli", '');
-	//Todo fue maravilloso  
-	  alert('¡Excelente! ahora volvé a centralizar los precios.');	
+	//Todo fue maravilloso	
 }	
 function errorCB(err){
 	console.log("Error procesando SQL:" + err.code);
@@ -491,6 +490,8 @@ function errorCB(err){
 
 function successCB(){
 	console.log("Dato insertado");
+	//alert('¡Excelente! ahora volvé a centralizar los precios.');	
+	navigator.notification.alert('¡Excelente! ahora volvé a centralizar los precios.', alertCallback, 'Centralizador dice:', 'Aceptar')
 }	
 	
     //FUCIONES  (ESTE TESTING ANDA)    
