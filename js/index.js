@@ -451,21 +451,42 @@ function successCB(){
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
 }		
 
-
-// alert dialog dismissed
-        function alertDismissed() {
-            // do something
-        }
+    // process the confirmation dialog result
+    function onConfirm(buttonIndex) {
+        alert('You selected button ' + buttonIndex);
+    }
 
 
 	function showAlert() {
         navigator.notification.alert(
-            'You are the winner!',  // message
-            alertDismissed,         // callback
-            'Game Over',            // title
-            'Done'                  // buttonName
+            'No hay artículos nuevos para actualizar la aplicación. La fecha y hora que se ejecutó por última vez fue ' + fua_cli + '. ¿De todas maneras deseas forzar la centralización?',  // message
+            onConfirm, // callback
+            'Centralizador dice:', // title
+            'Forzar, Cancelar' // buttonName
         );
     }
+	
+	
+	//Borro los datos de la tabla.
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(function(tx) {
+	tx.executeSql("delete from erp_articulos");
+	}, errorCB, successCB);
+	
+	//Actualizo la fecha de última actualización.
+	  window.localStorage.setItem("fua_cli", '');
+	//Todo fue maravilloso  
+	  alert('¡Excelente! ahora volvé a centralizar los precios.');	
+	
+function errorCB(err){
+	console.log("Error procesando SQL:" + err.code);
+	alert("Error procesando SQL:" + err.code + '-' + err.message);
+}
+
+function successCB(){
+	console.log("Dato insertado");
+}	
+	
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
     {
