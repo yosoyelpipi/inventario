@@ -33,8 +33,6 @@
     <access origin="*.pushbots.com" />	
 	<access origin="http://leocondori.com.ar" />
     <content src="index.html" />
-	
-	<uses-permission android:name="android.permission.VIBRATE" />
     
     <gap:plugin name="com.phonegap.plugins.barcodescanner" version="2.0.0" />
 	<gap:plugin name="org.apache.cordova.device" version="0.2.12" />
