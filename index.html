@@ -39,7 +39,10 @@
       #helpNow{display:none;}
       #probarWS{display:none;}
       #conectando{display:none;}
-    </style>
+	  #conectandonos{display:none;}
+	  #estadoSync{display:none;}
+	  #leo{display:none;}
+    </style>	
   </head>
 
   <body>
@@ -99,21 +102,27 @@
       <button type="button" onClick="genInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Generación de inventario</button>
       <button type="button" onClick="tomaInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Toma de inventario</button>
       <button type="button" onClick="depInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depuración</button>      
-    </div><!--FIN INDEX Bienvenida-->
+	  <center><div id="estadoSync"><img src="img/juego-chrome.gif" width="95%"><br><br></div></center>
+	</div><!--FIN INDEX Bienvenida-->
 
 
 <!-- GENERACION DE TOMA DE INVENTARIO -->
     <div class="container" id="genInventario">
+	<ol class="breadcrumb">
+	  <li><a href="index.html">Stock</a></li>
+	  <li class="active">Generación toma de inventario</li>
+	</ol>	
       <div class="page-header">
-        <h1>Generación Toma de inventario</h1>
+        <h3>Selecciona el depósito a inventariar</h3>
       </div>
-      <p class="lead">Selecciona el depósito a inventariar</p>
+      <p class="lead"></p>
       <button type="button" class="btn btn-primary btn-lg btn-block" id="actInventario"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Actualizar toma de inventario</button>
       <hr>
 	  <div id="conectando"><br><center><img src="img/android.gif" width="100px"></center><br></div>
       <div class="list-group" id="depositos">
       <!-- Lo completo desde Javascript -->  
-      </div>          
+      </div>
+		
     </div><!-- FIN GENERACION DE TOMA DE INVENTARIO -->
 
 
@@ -123,7 +132,13 @@
         <h1>Bienvenido...comencemos</h1>
       </div>
       <p class="lead">Elegí...vas a inventariar por código de barras o por artículos.</p>
-
+	  <button type="button" onClick="CargoArticulos();" class="btn btn-success btn-lg btn-block"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Cargar artículos</button>
+	  <!--<button type="button" onClick="CargoArticulos();" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Clientes</button>-->
+	  <br>
+	  <div id="leo">
+			<img src="img/juego-chrome.gif" width="95%">
+			<br>
+	  </div>
     </div><!-- FIN TOMA DE INVENTARIO -->
 
 
@@ -194,14 +209,14 @@
             <button type="button" class="btn btn-danger" onClick="Cleaner()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Limpiar</button>
           </form>	
           <hr>
+		  <center><div id="conectandonos"> <img src="img/juego-chrome.gif" width="95%"><br><br></div></center>
           <div id="testeer">
             <center>
               <div class="btn-group" role="group" aria-label="..." style="margin-left:0px; margin-right:0px; margin-top:0px;">
-                <button type="button" id="conexion" class="btn btn-default"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Conexión</button>
-                <button type="button" id="testlogin" class="btn btn-default"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</button>
-                <button type="button" id="redmovil"  onclick="checkConnection()" class="btn btn-default"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Red móvil</button>
-              </div>				
-              <div id="conectando"><br><img src="img/loading.gif" width="64px"><br></div>
+                <button type="button" id="conexion" class="btn btn-primary"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Conexión</button>
+                <button type="button" id="testlogin" class="btn btn-primary"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</button>
+                <button type="button" id="redmovil"  onclick="checkConnection()" class="btn btn-primary"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Red móvil</button>
+              </div>
             </center>
           </div>          
           <hr>

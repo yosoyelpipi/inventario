@@ -7,6 +7,9 @@ var defws;
 var defdb;
 var defuser;
 var defpass;
+var existe_db;
+var dbcreate;
+var fua_cli;
 
 var app = {
     // Application Constructor
@@ -17,6 +20,20 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
     onDeviceReady: function() {
+		
+	existe_db = window.localStorage.getItem("existe_db");	
+	
+	dbcreate = window.openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	
+	if(!existe_db){
+	    console.log("la BD es null");
+		creaDB();
+	}else{
+		console.log("la BD está definida");
+		//cargaDatos();
+		//CargoArticulos();
+	}	
+		
 	
 	//Inicializo las notificaciones Push
 	if(PushbotsPlugin.isAndroid()){
@@ -195,39 +212,38 @@ function Cleaner(){
     $("#conexion").click(function(){
         console.log('Hiciste click en el botón con ID "conexion". ');
                 var url = window.localStorage.getItem("ws");
-                $("#conectando").show();
+                $("#conectandonos").show();
                 $.getJSON("http://leocondori.com.ar/app/local/testws.php", {ws: url, precio: 20}, resultConn, "json");          
         })
 
 /* Función captura la respuesta del testeo de conexión */
 		function resultConn(respuesta){
 			if (respuesta.valor == 1){
-				$("#conectando").hide();				   
+				$("#conectandonos").hide();				   
 				alert('Conexión creada con éxito.');
 			}else{
-				$("#conectando").hide();
+				$("#conectandonos").hide();
 				alert('No se pudo realizar una conexión con el servicio web solicitado');
 			}
 		}
 
 /* Testeo-Login */
     $("#testlogin").click(function(){
+	$("#conectandonos").show();	
     var WebService = window.localStorage.getItem("ws");
 	var BaseDeDatos = window.localStorage.getItem("db");
 	var Usuario = window.localStorage.getItem("user");
-	var Clave = window.localStorage.getItem("pass");
-        
-    $("#conectando").show();		
+	var Clave = window.localStorage.getItem("pass");	
         $.getJSON("http://leocondori.com.ar/app/local/itslogin.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave}, ItsLogin, "json");
     })
 
 /* Función que captura la respuesta del testeo del login */
     function ItsLogin(Response){
         if (Response.ItsLoginResult == 1){
-            $("#conectando").hide();				   
+            $("#conectandonos").hide();				   
             alert('Error : ' + Response.motivo);
         }else{
-            $("#conectando").hide();
+            $("#conectandonos").hide();
             alert('Login realizado con éxito: ' + Response.session);
         }
     }
@@ -238,7 +254,8 @@ function Cleaner(){
 	   var BaseDeDatos = window.localStorage.getItem("db");
 	   var Usuario = window.localStorage.getItem("user");
 	   var Clave = window.localStorage.getItem("pass");
-       $("#conectando").show();          
+       $("#conectando").show();
+	   
        $.getJSON("http://leocondori.com.ar/app/inventario/erpgeninv.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave}, ItsGenInv, "json"); 
     })
     
@@ -269,9 +286,10 @@ function defDeposito(f,d,de){
     alert(f);
     alert(d);
     alert(de);
+	//CargoArticulos();
 }        
     
-/* Testo de conexión móvil */
+/* Testeo de conexión móvil */
 function checkConnection() {
             var networkState = navigator.connection.type;
 
@@ -294,4 +312,152 @@ function checkConnection() {
 			}
 			
             //alert(states[networkState]);
-        }        
+        }
+
+/*
+*Creación de base de datos
+*/
+function creaDB(){
+	dbcreate.transaction(creaNuevaDB, errorDB, crearSuccess);
+	}
+
+function creaNuevaDB(tx){
+	console.log("Creando base de datos.");
+	
+	tx.executeSql('DROP TABLE IF EXISTS erp_inventario');
+	//Creo la tabla toma de inventario.
+	var sql = "CREATE TABLE IF NOT EXISTS erp_inventario( " +
+	          "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+			  "FK_ERP_ARTICULOS VARCHAR(15)," +
+			  "FK_ERP_DEPOSITOS VARCHAR(15)," +
+			  "CANTIDAD VARCHAR(10)," +
+			  "FECHA DATE )";			  
+	tx.executeSql(sql);
+	console.log('Creé la tabla erp_inventario');
+
+	//Creo la tabla ERP_ARTICULOS.
+	tx.executeSql('DROP TABLE IF EXISTS ERP_ARTICULOS');
+	var ERP_ARTICULOS = "CREATE TABLE IF NOT EXISTS ERP_ARTICULOS ( " +
+						"id VARCHAR(50) PRIMARY KEY," +
+						"DESCRIPCION VARCHAR(100) )";
+	tx.executeSql(ERP_ARTICULOS);
+	console.log('Creé la tabla ERP_ARTICULOS');
+	
+	//Marco a la aplicación para que sepa que la base de datos ya está creada.
+	window.localStorage.setItem("existe_db", 1);
+}
+
+function crearSuccess(){
+	console.log('La base y tablas se crearon con éxito.');
+	//cargaDatos();	
+}
+
+function errorDB(err){
+	console.log("Error procesando SQL:" + err.message);
+	alert("Error procesando SQL:" + err.message);
+}
+
+function test(){
+	$("#leo").hide();	
+}
+function testing(){
+	$("#leo").show();	
+}
+
+//************* ARTICULOS *************	
+	function CargoArticulos(){
+	$("#leo").show();
+	
+       var WebService = window.localStorage.getItem("ws");
+	   var BaseDeDatos = window.localStorage.getItem("db");
+	   var Usuario = window.localStorage.getItem("user");
+	   var Clave = window.localStorage.getItem("pass");
+	   
+			//Para la pimera ejecución, entonces controlo si está declarada o no.
+			var fua_cli = window.localStorage.getItem("fua_cli");
+			if(!fua_cli){
+				var fec_ult_act_cli = '';
+			}else{
+				var fec_ult_act_cli = fua_cli;
+			}
+				$.getJSON("http://leocondori.com.ar/app/inventario/down_art.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave, fua_cliente: fec_ult_act_cli}, ItsDownloadClient, "json");
+	}
+//FIN: Sincronizo clientes
+
+		function ItsDownloadClient(Response){
+			if (Response.ItsLoginResult == 1){
+				$("#leo").hide();				   
+				alert('Error : ' + Response.motivo);
+			}else{
+					$("#leo").hide();
+					
+					//Muestro un DIV para informar algo al usuario.
+					$("#instala").show();
+					
+					if(Response.Cantidad != 0){
+
+					var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+					db.transaction(crearEmpresa, errorCB, successCB);
+function crearEmpresa(tx){													
+						for(x=0; x<Response.Data.length; x++) {
+								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
+								console.log('Esto es el DESC: '+ Response.Data[x]["DESCRIPCION"]);
+								tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"') ");
+							}
+						}
+						
+						$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
+						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
+						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
+						console.log('Fecha de última actualización:' + Response.ItsGetDate);						
+						//$("#instala").fadeOut(10000);						
+					}else{
+						fua_cli = window.localStorage.getItem("fua_cli");
+			if( confirm("No hay artículos nuevss para centralizar, la fecha y hora que se ejecutó por última vez es " + fua_cli + ". De todas maneras ¿Desea forzar la centralización? se perderán todas las empresas guardadas.") )
+            {
+			//Borro los datos de la tabla.
+			var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+			db.transaction(function(tx) {
+			tx.executeSql("delete from ERP_ARTICULOS");
+			}, errorCB, successCB);
+			
+			//Actualizo la fecha de última actualización.
+			  window.localStorage.setItem("fua_cli", '');
+			//Todo fue maravilloso  
+              alert('¡Excelente! ahora volvé a centralizar las empresas.');
+				//location.reload();			  
+            }
+					
+						//$("#instala").html('<span class="label label-info">Tenés el maestro de empresas actualizado</span><br>');
+						$("#instala").fadeOut(9000);
+					}
+			}
+		}
+		
+function errorCB(err){
+	console.log("Error procesando SQL:" + err.code);
+	//navigator.notification.alert("Error procesando SQL:" + err.code);
+	alert("Error procesando SQL:" + err.code + '-' + err.message);
+}
+
+function successCB(){
+	console.log("Dato insertado");
+	//navigator.notification.alert("Error procesando SQL:" + err.code);
+}		
+
+    //FUCIONES  (ESTE TESTING ANDA)    
+   /* function ItsDownloadClientes(respuesta)
+    {
+        if (respuesta.ItsLoginResult == 0){
+            $("#leo").hide();
+			for(x=0; x<respuesta.Data.length; x++) {
+				console.log('Esto es el ID: '+ respuesta.Data[x]["ID"]);
+				console.log('Esto es la descripción de ARTICULOS: '+ respuesta.Data[x]["DESCRIPCION"]);
+			}
+			alert('Preparamos la aplicación para la toma de inventario con éxito.');
+        }else{
+            $("#leo").hide();
+            alert('Existió un error' + respuesta.motivo);
+        }
+    }*/
+//************* ARTICULOS *************
