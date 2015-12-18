@@ -34,9 +34,6 @@
 	<access origin="http://leocondori.com.ar" />
     <content src="index.html" />
 	
-	<feature name="Notification">
-    <param name="android-package" value="org.apache.cordova.Notification" />
-    </feature>
 	<uses-permission android:name="android.permission.VIBRATE" />
     
     <gap:plugin name="com.phonegap.plugins.barcodescanner" version="2.0.0" />
