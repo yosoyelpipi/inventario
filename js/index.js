@@ -71,7 +71,7 @@ function scanear(){
             //Guardamos el resultado del código QR o código de barras en una variable
             var codigoQR=result.text;
             //Introducimos esa variable en el campo 
-            $('#resultado').html(codigoQR);
+            $('#contado').append(codigoQR);
         }, 
         //Si no, ejecuta la función error.
         function (error) {
@@ -104,6 +104,27 @@ function genInventario(){
 function tomaInventario(){
     verificarWS('tomaInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelvé toma de inventario.');
     $('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();
+	
+	//Si tiene depósito seleccionado te dejo hacer el inventario.
+	
+	//Levanto el ID del depósito seleccionado.
+	var depo = window.localStorage.getItem("deposito");
+	
+	var desDepo = window.localStorage.getItem("des_dep");
+	
+	//Ahora controlo si la varaible esta definida o no.	
+	if(!depo){
+		$('#TomaDeInventario').html('<div class="alert alert-danger" role="alert">Oh snap! No tenés definido aún ningún depósito, andá a la generación de inventario y seleccioná un depósito. De lo contrario no vas a poder realizarlo.</div>');
+		$('#DesDepo').html('<span class="label label-danger" >Sin definir</span>');
+	}else{
+		$('#TomaDeInventario').html('<div class="btn-group btn-group-lg" role="group" aria-label="..."> ' +
+										'<button type="button" onClick="scanear()" class="btn btn-primary"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Código de Barras</button> ' +
+										'<button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>' +
+									'</div>');
+		$('#DesDepo').html('<span class="label label-success" >' + desDepo + '</span>');
+	}
+	
+	
 }
 function depInventario(){
     verificarWS('depInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar depurar una toma de inventario.');
@@ -283,10 +304,15 @@ function Cleaner(){
  
 //Agregar el depósito activo.    
 function defDeposito(f,d,de){
-    alert(f);
-    alert(d);
-    alert(de);
-	//CargoArticulos();
+	window.localStorage.setItem("fecha", f);
+	window.localStorage.setItem("deposito", d);
+	window.localStorage.setItem("des_dep", de);
+    alert('La fecha seleccionada es: '+ f);
+    //alert('' + d);
+    alert('El depósito seleccionado es: ' + de);
+	
+	//Lo redirecciono a la toma de inventario.
+	tomaInventario();
 }        
     
 /* Testeo de conexión móvil */
@@ -453,18 +479,20 @@ function alertCallback(){
 function successArt(){
 	console.log("Dato insertado");
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
-	navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar')
+	navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar');
+	
+	$('#depositos').html('');
+	//Escribo algo en el HTML	
 }		
 
     // process the confirmation dialog result
     function onConfirm(buttonIndex) {
-        //alert('You selected button ' + buttonIndex);
-		resetArticulos();
+		if (buttonIndex==1){resetArticulos();}
     }
 
 
 	function showAlert() {
-        navigator.notification.alert(
+        navigator.notification.confirm(
             'No hay artículos nuevos para actualizar la aplicación. La fecha y hora que se ejecutó por última vez fue ' + fua_cli + '. ¿De todas maneras deseas forzar la centralización?',  // message
             onConfirm, // callback
             'Centralizador dice:', // title

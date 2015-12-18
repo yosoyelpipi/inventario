@@ -111,12 +111,9 @@
 	<ol class="breadcrumb">
 	  <li><a href="index.html">Stock</a></li>
 	  <li class="active">Generación toma de inventario</li>
-	</ol>	
-      <div class="page-header">
-        <h3>Selecciona el depósito a inventariar</h3>
-      </div>
+	</ol>
       <p class="lead"></p>
-      <button type="button" class="btn btn-primary btn-lg btn-block" id="actInventario"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Actualizar toma de inventario</button>
+      <button type="button" class="btn btn-primary btn-lg btn-block" id="actInventario"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Elegir depósito</button>
       <hr>
 	  <div id="conectando"><br><center><img src="img/android.gif" width="100px"></center><br></div>
       <div class="list-group" id="depositos">
@@ -128,17 +125,25 @@
 
 <!-- TOMA DE INVENTARIO -->
     <div class="container" id="tomaInventario">
-      <div class="page-header">
-        <h1>Bienvenido...comencemos</h1>
-      </div>
-      <p class="lead">Elegí...vas a inventariar por código de barras o por artículos.</p>
-	  <button type="button" onClick="CargoArticulos();" class="btn btn-success btn-lg btn-block"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Cargar artículos</button>
-	  <!--<button type="button" onClick="CargoArticulos();" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Clientes</button>-->
+	<div id="DesDepo"></div>
+	<br>
+	<ol class="breadcrumb">
+	  <li><a href="index.html">Stock</a></li>
+	  <li class="active">Toma de inventario</li>
+	</ol>	
+      <p class="lead">Realizá la carga inicial de artículos y elegí el método por el cual vas a inventarear.</p>
+	  <button type="button" onClick="CargoArticulos();" class="btn btn-success btn-lg btn-block">
+			<span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> 
+			Actualizar artículos
+	  </button>
 	  <br>
 	  <div id="leo">
 			<img src="img/juego-chrome.gif" width="95%">
 			<br>
 	  </div>
+	  <div id="TomaDeInventario" align="center"></div>
+	  <div id="contado"></div>
+	  
     </div><!-- FIN TOMA DE INVENTARIO -->
 
 
