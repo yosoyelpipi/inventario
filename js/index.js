@@ -397,7 +397,7 @@ function testing(){
 					if(Response.Cantidad != 0){
 
 					var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
-					db.transaction(crearEmpresa, errorCB, successCB);
+					db.transaction(crearEmpresa, errorCB, successArt);
 function crearEmpresa(tx){													
 						for(x=0; x<Response.Data.length; x++) {
 								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
@@ -446,14 +446,20 @@ function errorCB(err){
 	alert("Error procesando SQL:" + err.code + '-' + err.message);
 }
 
-function successCB(){
+function alertCallback(){
+	console.log("AlertCallback");
+}
+
+function successArt(){
 	console.log("Dato insertado");
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
+	navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar')
 }		
 
     // process the confirmation dialog result
     function onConfirm(buttonIndex) {
-        alert('You selected button ' + buttonIndex);
+        //alert('You selected button ' + buttonIndex);
+		resetArticulos();
     }
 
 
@@ -466,7 +472,7 @@ function successCB(){
         );
     }
 	
-	
+function resetArticulos(){	
 	//Borro los datos de la tabla.
 	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
 	db.transaction(function(tx) {
@@ -477,7 +483,7 @@ function successCB(){
 	  window.localStorage.setItem("fua_cli", '');
 	//Todo fue maravilloso  
 	  alert('¡Excelente! ahora volvé a centralizar los precios.');	
-	
+}	
 function errorCB(err){
 	console.log("Error procesando SQL:" + err.code);
 	alert("Error procesando SQL:" + err.code + '-' + err.message);
