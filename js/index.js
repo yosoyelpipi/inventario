@@ -83,7 +83,8 @@ function scanear(){
 };
 
 function loop(){
-	scanear();
+	if(confirm("¿Seguís usando el escaner?") )
+            {scanear();}
 }
 //Verifico si el usuario definió o no el WS
 function verificarWS(c,m){
