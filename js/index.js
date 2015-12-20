@@ -1,4 +1,8 @@
 /* global $ */
+
+
+
+
 var ws;
 var db;
 var user;
@@ -71,7 +75,49 @@ function scanear(){
             //Guardamos el resultado del código QR o código de barras en una variable
             var codigoQR=result.text;
             //Introducimos esa variable en el campo 
-            $('#contado').append(codigoQR);
+            //ANDA ESCRIBE RESULTADOS
+			$('#contado').html('<input type="hidden" class="form-control" id="CodBarrasLeido" value="'+codigoQR+'">');
+
+		/*
+		BUSCAR EMPRESAS
+		*/
+		function searchEmpresas(){
+			db.transaction(searchEmp, errorDB);
+		}
+		function searchEmp(tx){
+			var searchEmpresa = $("#CodBarrasLeido").val();
+			
+			if(!searchEmpresa){
+				alert('Tenés que ingresar un valor para iniciar la búsqueda');
+				return;
+			}
+			
+			console.log("Buscando código de barra ::: "+searchEmpresa+" ::: de la base de datos de la aplicación.");
+			tx.executeSql('select * from erp_articulos where cod_barra = \'%'+ searchEmpresa +'%\' ', [], searchEmpSuccess, errorDB);
+		}			
+
+
+	function searchEmpSuccess(tx, results){
+		if(results.rows.length == 0){
+			var searchFail = $("#CodBarrasLeido").val();
+			console.log("No hay resultados para la busqueda (" + searchFail + ") seleccionada.");
+			alert("No hay artículos con el siguiente código de barra (" + searchFail + ") intenta registrar el artículo por número de código.");
+		}else{	
+		//$("#erparticulos").hide();
+		console.log('Entro acá porque existen datos.');
+				for(var x=0; x<results.rows.length; x++){
+					var empresult = results.rows.item(x);
+					//Grabo en la consola el estado de los resultados.
+					console.log('Encontre esto: ' + empresult.descripcion);
+
+				var fa = window.localStorage.getItem("fecha");
+				var deo = window.localStorage.getItem("deposito");
+				var dd = window.localStorage.getItem("des_dep");
+		
+				tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.fk_erp_articulos+"', '"+deo+"', '1', '"+fa+"') ");
+				}	    
+		}	
+	}
 			//Llamo nuevamente al léctor de código de barras.
 			loop();
         }, 
@@ -81,6 +127,27 @@ function scanear(){
         }
     );
 };
+
+/*
+Graba pedidos
+*/
+function clickMeArt(erp_articulos){
+	var erp_articulos;
+	grabaDatos();
+}
+
+function grabaDatos(){
+	db.transaction(grabaRegistros, errorDB);
+}
+
+function grabaRegistros(tx){
+	var fechia = window.localStorage.getItem("fecha");
+	var deposi = window.localStorage.getItem("deposito");
+	var descripdepo = window.localStorage.getItem("des_dep");
+
+	tx.executeSql("insert into erp_inventario (fk_articulos, fk_erp_depositos, cantidad, fecha)values('"+erp_articulos+"','"+deposi +"', 1, '"+fechia+"') ", [], grabarDatosSuccess, errorDB);
+	console.log("inserté linea para migrar");
+}
 
 function loop(){
 	if(confirm("¿Seguís usando el escaner?") )
@@ -104,6 +171,15 @@ function verificarWS(c,m){
 }
 
 function genInventario(){
+//Levanto el ID del depósito seleccionado.
+	var depo = window.localStorage.getItem("deposito");	
+	var desDepo = window.localStorage.getItem("des_dep");	
+	
+if(!depo){
+		$('#DesDepoRefresh').html('<span class="label label-danger" >Sin definir</span>');
+	}else{
+		$('#DesDepoRefresh').html('<span class="label label-success" >' + desDepo + '</span>');
+	}	
     verificarWS('genInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar generar una toma de inventario.');
     $('#tomaInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();
 }
@@ -114,8 +190,7 @@ function tomaInventario(){
 	//Si tiene depósito seleccionado te dejo hacer el inventario.
 	
 	//Levanto el ID del depósito seleccionado.
-	var depo = window.localStorage.getItem("deposito");
-	
+	var depo = window.localStorage.getItem("deposito");	
 	var desDepo = window.localStorage.getItem("des_dep");
 	
 	//Ahora controlo si la varaible esta definida o no.	
@@ -123,7 +198,8 @@ function tomaInventario(){
 		$('#TomaDeInventario').html('<div class="alert alert-danger" role="alert">Oh snap! No tenés definido aún ningún depósito, andá a la generación de inventario y seleccioná un depósito. De lo contrario no vas a poder realizarlo.</div>');
 		$('#DesDepo').html('<span class="label label-danger" >Sin definir</span>');
 	}else{
-		$('#TomaDeInventario').html('<button type="button" onClick="scanear()" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Por código de barras</button>' +
+		$('#TomaDeInventario').html('<button type="button" onClick="CargoArticulos()" class="btn btn-success btn-lg btn-block"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> Actualizar artículos</button><br> ' +
+									'<button type="button" onClick="scanear()" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Por código de barras</button>' +
 									'<button type="button" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>');
 		$('#DesDepo').html('<span class="label label-success" >' + desDepo + '</span>');
 	}
@@ -292,6 +368,7 @@ function Cleaner(){
                 $('#depositos').html('');
                 
                 for(var x=0; x<Response.Data.length; x++) {
+					console.log('Esta es la cantidad: ' + Response.Data.length);
                     console.log(Response.Data[x]["FECHA"]);
                     console.log(Response.Data[x]["FK_ERP_DEPOSITOS"]);
                     console.log(Response.Data[x]["DES_DEP"]);
@@ -311,6 +388,8 @@ function defDeposito(f,d,de){
 	window.localStorage.setItem("fecha", f);
 	window.localStorage.setItem("deposito", d);
 	window.localStorage.setItem("des_dep", de);
+	
+	//var dateString = today.format("dd-m-yy");
     alert('La fecha seleccionada es: '+ f);
     //alert('' + d);
     alert('El depósito seleccionado es: ' + de);
@@ -369,7 +448,8 @@ function creaNuevaDB(tx){
 	tx.executeSql('DROP TABLE IF EXISTS ERP_ARTICULOS');
 	var ERP_ARTICULOS = "CREATE TABLE IF NOT EXISTS ERP_ARTICULOS ( " +
 						"id VARCHAR(50) PRIMARY KEY," +
-						"DESCRIPCION VARCHAR(100) )";
+						"DESCRIPCION VARCHAR(100), " + 
+						"COD_BARRA VARCHAR(15) )";
 	tx.executeSql(ERP_ARTICULOS);
 	console.log('Creé la tabla ERP_ARTICULOS');
 	
@@ -432,37 +512,14 @@ function crearEmpresa(tx){
 						for(x=0; x<Response.Data.length; x++) {
 								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
 								console.log('Esto es el DESC: '+ Response.Data[x]["DESCRIPCION"]);
-								tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"') ");
+								console.log('Esto es el COD_BARRA: '+ Response.Data[x]["COD_BARRA"]);
+								tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
 							}
-						}
-						
-						$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
-						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
-						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
-						console.log('Fecha de última actualización:' + Response.ItsGetDate);						
+						}						
 						//$("#instala").fadeOut(10000);						
-					}else{
-						
-						
+					}else{						
 						fua_cli = window.localStorage.getItem("fua_cli");
-                        showAlert();						
-						
-						
-						
-			/*if( confirm("No hay artículos nuevos para centralizar, la fecha y hora que se ejecutó por última vez es " + fua_cli + ". De todas maneras ¿Desea forzar la centralización? se perderán todas las empresas guardadas.") )
-            {
-			//Borro los datos de la tabla.
-			var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
-			db.transaction(function(tx) {
-			tx.executeSql("delete from ERP_ARTICULOS");
-			}, errorCB, successCB);
-			
-			//Actualizo la fecha de última actualización.
-			  window.localStorage.setItem("fua_cli", '');
-			//Todo fue maravilloso  
-              alert('¡Excelente! ahora volvé a centralizar las empresas.');
-				//location.reload();			  
-            }*/
+                        showAlert();
 					
 						//$("#instala").html('<span class="label label-info">Tenés el maestro de empresas actualizado</span><br>');
 						$("#instala").fadeOut(9000);
@@ -482,6 +539,11 @@ function alertCallback(){
 
 function successArt(){
 	console.log("Dato insertado");
+	$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
+	window.localStorage.setItem("fua_cli", Response.ItsGetDate);
+	$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
+	console.log('Fecha de última actualización:' + Response.ItsGetDate);
+	
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
 	navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar');
 	
@@ -523,7 +585,7 @@ function errorCB(err){
 function successCB(){
 	console.log("Dato insertado");
 	//alert('¡Excelente! ahora volvé a centralizar los precios.');	
-	navigator.notification.alert('¡Excelente! ahora volvé a centralizar los precios.', alertCallback, 'Centralizador dice:', 'Aceptar')
+	navigator.notification.alert('¡Excelente! ahora volvé a centralizar los artículos.', alertCallback, 'Centralizador dice:', 'Aceptar')
 }	
 	
     //FUCIONES  (ESTE TESTING ANDA)    
