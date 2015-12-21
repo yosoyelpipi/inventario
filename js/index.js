@@ -167,14 +167,41 @@ function loop(codigo){
 				var fa = window.localStorage.getItem("fecha");
 				var deo = window.localStorage.getItem("deposito");
 				var dd = window.localStorage.getItem("des_dep");
-		
-				tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '1', '"+fa+"') ");
+				
+					var person = prompt("Ingresá la cantidad", "");
+					if (person != null) {
+						//document.getElementById("demo").innerHTML =
+						//"Hello " + person + "! How are you today?";
+						console.log('Ingreso algo distinto de NULL, parece un número, mirá: ' + person);
+						var cancontado = person;
+						tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '"+cancontado+"', '"+fa+"') ");				
+						if(confirm("Dato ingresado. ¿Seguís usando el escaner?") ){scanear();}
+					}else{
+						console.log('Ingresó algo parecido a NULL: '+ person);
+						var cancontado = person;
+						sinCantidad(empresult.id);
+					}
 				}
-		if(confirm("Dato insertado. ¿Seguís usando el escaner?") ){scanear();}
 		}	
 	}
 }
+function sinCantidad(art){
+	var art;
+	console.log('Se canceló el ingreso del artículo '+ art +' porque no ingresaste la cantidad.');
+	if(confirm("Se canceló el ingreso del artículo "+ art +" porque no ingresaste la cantidad. ¿Seguís usando el escaner?") ){scanear();}
+}
+/*
+function errorIngreso(){
+	console.log('Error desconocido a insertar artículo');
+	alert('Error desconocido a insertar artículo');
+	if(confirm("Lectura cancelada. ¿Seguís usando el escaner?") ){scanear();}
+}
 
+function successIngreso(){
+	console.log('Exito al insertar artículo');
+	alert('Exito al insertar artículo');
+	if(confirm("Dato ingresado. ¿Seguís usando el escaner?") ){scanear();}
+}*/
 
 function genInventario(){
 //Levanto el ID del depósito seleccionado.
