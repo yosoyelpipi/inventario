@@ -23,8 +23,8 @@ $pass = $_GET["pass"];
 $fua = $_GET["fua_cliente"];
 
 /*
-$ws = "http://200.55.245.171:6103/ITSWS/ItsCliSvrWS.asmx?WSDL";
-$bd = "ECOMMERCE";
+$ws = "http://itris.no-ip.com:3000/ITSWS/ItsCliSvrWS.asmx?WSDL";
+$bd = "TOMA_INVENTARIO";
 $user = "lcondori";
 $pass = "123";
 $fua = '';
@@ -42,7 +42,7 @@ $client = new nusoap_client($ws,true);
 					 $err = utf8_encode($LastErro['Error']);
 					echo json_encode(array("ItsLoginResult"=>$error, "motivo"=>$err));
 				}else{
-				$empresas = $client->call('ItsGetData', array('UserSession' => $session, 'ItsClassName' => 'ERP_ARTICULOS', 'RecordCount' => '3000', 'SQLFilter'=>"VENTA = '1' and HABILITADO='1'and TIPO = 'P' and FEC_ULT_ACT > '".$fua."' ", 'SQLSort'=> '') );
+				$empresas = $client->call('ItsGetData', array('UserSession' => $session, 'ItsClassName' => '_ERP_ARTICULOS_APP', 'RecordCount' => '3000', 'SQLFilter'=>"FEC_ULT_ACT > '".$fua."' ", 'SQLSort'=> '') );
 				$ItsGetDataResult = $empresas["ItsGetDataResult"];
 				$DataEmpresas = $empresas["XMLData"];
 
@@ -57,7 +57,7 @@ $client = new nusoap_client($ws,true);
 								//Ahora comienzo a recorrer el XML para mostrar los atributos por pantalla.
 								$langs = $array['ROWDATA']['ROW'];
 								$count = sizeof($langs);
-								if($count==''){$counts=0;}
+								if($count==''){$counts=0;}else{$counts=$count;}
 
 					for ($i=0; $i<sizeof($langs); $i++){
 							if($count == 1){

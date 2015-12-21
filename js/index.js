@@ -523,6 +523,13 @@ function crearEmpresa(tx){
 								console.log('Esto es el COD_BARRA: '+ Response.Data[x]["COD_BARRA"]);
 								tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
 							}
+							
+						console.log("Cantidad insertada: "+ Response.Cantidad);
+						$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
+						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
+						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
+						console.log('Fecha de última actualización:' + Response.ItsGetDate);							
+						
 						}						
 						//$("#instala").fadeOut(10000);						
 					}else{						
@@ -546,14 +553,10 @@ function alertCallback(){
 }
 
 function successArt(){
-	console.log("Dato insertado");
-	$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
-	window.localStorage.setItem("fua_cli", Response.ItsGetDate);
-	$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
-	console.log('Fecha de última actualización:' + Response.ItsGetDate);
-	
+
 	//navigator.notification.alert("Error procesando SQL:" + err.code);
-	navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar');
+	alert('Artículos centralizados con éxito');
+	//navigator.notification.alert('Artículos centralizados con éxito', alertCallback, 'Centralizador dice:', 'Aceptar');
 	
 	$('#depositos').html('');
 	//Escribo algo en el HTML	
