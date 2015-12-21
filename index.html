@@ -63,7 +63,7 @@
           <ul class="nav navbar-nav">
             <li><a href="javascript:genInventario()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Generación de inventario</a></li>
             <li><a href="javascript:tomaInventario()"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Toma de inventario</a></li>
-            <li><a href="javascript:depInventario()"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depuración</a></li>
+            <li><a href="javascript:depInventario()"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Informe</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Parámetros<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -148,9 +148,13 @@
 <!-- DEPURAR TOMA DE INVENTARIO -->
     <div class="container" id="depInventario">
       <div class="page-header">
-        <h1>Depuración de inventario</h1>
+        <h1>Informes de inventario</h1>
       </div>
-      <p class="lead">Vamos a borrar los inventarios generados...</p>
+      <p class="lead">Toma parcial de inventario</p>
+	  <input type="text" class="form-control" id="searchclient" placeholder="Buscar Art; cod. barras" autofocus>
+	  <button type="button" onclick="searchEmpresas();" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Aplicar</button>
+	  <div id="erpempresassearch"></div>
+	  
     </div><!-- FIN DEPURAR TOMA DE INVENTARIO -->
 
 <!-- CONFIGURAR WS -->

@@ -78,11 +78,44 @@ function scanear(){
             //ANDA ESCRIBE RESULTADOS
 			$('#contado').html('<input type="hidden" class="form-control" id="CodBarrasLeido" value="'+codigoQR+'">');
 
+			//Llamo nuevamente al léctor de código de barras.
+			loop();
+        }, 
+        //Si no, ejecuta la función error.
+        function (error) {
+            notificacion("Ha ocurrido un error al escanear.");
+        }
+    );
+};
+
+/*
+Graba pedidos
+*/
+function clickMeArt(erp_articulos){
+	var erp_articulos;
+	grabaDatos();
+}
+
+function grabaDatos(){
+	db.transaction(grabaRegistros, errorDB);
+}
+
+function grabaRegistros(tx){
+	var fechia = window.localStorage.getItem("fecha");
+	var deposi = window.localStorage.getItem("deposito");
+	var descripdepo = window.localStorage.getItem("des_dep");
+
+	tx.executeSql("insert into erp_inventario (fk_articulos, fk_erp_depositos, cantidad, fecha)values('"+erp_articulos+"','"+deposi +"', 1, '"+fechia+"') ", [], grabarDatosSuccess, errorDB);
+	console.log("inserté linea para migrar");
+}
+
+function loop(){
 		/*
 		BUSCAR EMPRESAS
 		*/
 		function searchEmpresas(){
-			db.transaction(searchEmp, errorDB);
+			var dbbb = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+			dbbb.transaction(searchEmp, errorDB);
 		}
 		function searchEmp(tx){
 			var searchEmpresa = $("#CodBarrasLeido").val();
@@ -117,39 +150,8 @@ function scanear(){
 				tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.fk_erp_articulos+"', '"+deo+"', '1', '"+fa+"') ");
 				}	    
 		}	
-	}
-			//Llamo nuevamente al léctor de código de barras.
-			loop();
-        }, 
-        //Si no, ejecuta la función error.
-        function (error) {
-            notificacion("Ha ocurrido un error al escanear.");
-        }
-    );
-};
-
-/*
-Graba pedidos
-*/
-function clickMeArt(erp_articulos){
-	var erp_articulos;
-	grabaDatos();
-}
-
-function grabaDatos(){
-	db.transaction(grabaRegistros, errorDB);
-}
-
-function grabaRegistros(tx){
-	var fechia = window.localStorage.getItem("fecha");
-	var deposi = window.localStorage.getItem("deposito");
-	var descripdepo = window.localStorage.getItem("des_dep");
-
-	tx.executeSql("insert into erp_inventario (fk_articulos, fk_erp_depositos, cantidad, fecha)values('"+erp_articulos+"','"+deposi +"', 1, '"+fechia+"') ", [], grabarDatosSuccess, errorDB);
-	console.log("inserté linea para migrar");
-}
-
-function loop(){
+	}	
+	
 	if(confirm("¿Seguís usando el escaner?") )
             {scanear();}
 }
@@ -587,6 +589,60 @@ function successCB(){
 	//alert('¡Excelente! ahora volvé a centralizar los precios.');	
 	navigator.notification.alert('¡Excelente! ahora volvé a centralizar los artículos.', alertCallback, 'Centralizador dice:', 'Aceptar')
 }	
+
+
+
+/*
+BUSCAR EMPRESAS
+*/
+
+function searchEmpresas(){
+	var dbb = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	dbb.transaction(searchEmp, errorDB);
+}
+function searchEmp(tx){
+	var searchEmpresa = $("#searchclient").val();
+	
+	/*if(!searchEmpresa){
+		alert('Tenés que ingresar un valor para iniciar la búsqueda de empresas');
+		return;
+	}*/
+	
+	console.log("Cargando clientes ::: "+searchEmpresa+" :::de la base de datos.");
+	tx.executeSql('select * from erp_articulos where id like(\'%'+ searchEmpresa +'%\') or COD_BARRA like(\'%'+ searchEmpresa +'%\') ', [], searchEmpSuccess, errorDB);
+}
+function searchEmpSuccess(tx, results){
+	if(results.rows.length == 0){
+		var searchFail = $("#searchclient").val();
+		console.log("No hay resultados para la busqueda (" + searchFail + ")seleccionada.");
+		alert("No hay resultados para la busqueda (" + searchFail + ") seleccionada.");
+	}else{	
+	$("#erparticulos").hide();
+	console.log('Oculto todos los resultos sin limpiar datos. Para no volver a cargarlos.');
+	
+	$("#erpempresassearch").html('');
+	$("#erpempresassearch").show();
+	console.log('Limpie los resultados anteriores y vuelvo a mostrar los resultados.');
+	
+		for(var x=0; x<results.rows.length; x++){
+				var empresult = results.rows.item(x);
+				//Muestro la sección del buscador.
+				$("#googleEmp").show();
+				//Limpio la sección de resultados del buscador.
+				$("#erpempresassearch").show();
+				//Grabo en la consola el estado de los resultados.
+				console.log('Encontre esto: ' + empresult.DESCRIPCION);
+//if(!empresult.COD_BARRA){var = COD_BARRA = "S/C";}else{var = COD_BARRA = empresult.COD_BARRA;}				
+				//Imprimo los resultados encontrados.
+				$("#erpempresassearch").append('<button type="button" onclick="clickMeArticulos(\' '+ empresult.id + ' \', \' '+ empresult.DESCRIPCION +' \', \' '+ empresult.COD_BARRA + '\');" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> '+ empresult.id +' - '+ empresult.DESCRIPCION +' ['+ empresult.COD_BARRA +'] </button>');
+			}
+	}	
+}
+
+
+
+
+
 	
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
