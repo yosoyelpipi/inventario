@@ -79,7 +79,7 @@ function scanear(){
 			$('#contado').html('<input type="hidden" class="form-control" id="CodBarrasLeido" value="'+codigoQR+'">');
 
 			//Llamo nuevamente al léctor de código de barras.
-			loop();
+			loop('codigoQR');
         }, 
         //Si no, ejecuta la función error.
         function (error) {
@@ -105,55 +105,61 @@ function grabaRegistros(tx){
 	var deposi = window.localStorage.getItem("deposito");
 	var descripdepo = window.localStorage.getItem("des_dep");
 
-	tx.executeSql("insert into erp_inventario (fk_articulos, fk_erp_depositos, cantidad, fecha)values('"+erp_articulos+"','"+deposi +"', 1, '"+fechia+"') ", [], grabarDatosSuccess, errorDB);
+	tx.executeSql("insert into erp_inventario (fk_articulos, fk_erp_depositos, cantidad, fecha)values('"+erp_articulos+"','"+deposi +"', '1', '"+fechia+"') ", [], grabarDatosSuccess, errorDB);
 	console.log("inserté linea para migrar");
 }
 
-function loop(){
+function loop(codigo){
+	console.log('Arrancó la función loop');
+	searchEmpresas();
+	window.localStorage.setItem("codigoqr", codigo);
+	var codigo =  window.localStorage.getItem("codigoqr");
 		/*
 		BUSCAR EMPRESAS
 		*/
 		function searchEmpresas(){
+			console.log('Arrancó la función searchEmpresas');
 			var dbbb = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
 			dbbb.transaction(searchEmp, errorDB);
 		}
 		function searchEmp(tx){
-			var searchEmpresa = $("#CodBarrasLeido").val();
-			
-			if(!searchEmpresa){
+			console.log('Arrancó la función searchEmp');
+			//var codigo = $("#CodBarrasLeido").val();			
+			if(!codigo){
 				alert('Tenés que ingresar un valor para iniciar la búsqueda');
 				return;
-			}
-			
-			console.log("Buscando código de barra ::: "+searchEmpresa+" ::: de la base de datos de la aplicación.");
-			tx.executeSql('select * from erp_articulos where cod_barra = \'%'+ searchEmpresa +'%\' ', [], searchEmpSuccess, errorDB);
+			}			
+			console.log("Buscando código de barra ::: "+codigo+" ::: de la base de datos de la aplicación.");
+			tx.executeSql('select * from erp_articulos where COD_BARRA like (\'%'+ codigo +'%\') ', [], searchEmpSuccess, errorDB);
 		}			
 
 
 	function searchEmpSuccess(tx, results){
+		console.log('Arrancó la función searchEmpSuccess');
 		if(results.rows.length == 0){
-			var searchFail = $("#CodBarrasLeido").val();
-			console.log("No hay resultados para la busqueda (" + searchFail + ") seleccionada.");
-			alert("No hay artículos con el siguiente código de barra (" + searchFail + ") intenta registrar el artículo por número de código.");
-		}else{	
+			//var searchFail = $("#CodBarrasLeido").val();
+			
+			console.log("No hay resultados para la busqueda (" + codigo + ") seleccionada.");
+			alert("No hay artículos con el siguiente código de barra (" + codigo + ") intenta registrar el artículo por número de código.");
+			if(confirm("Sin resultados. ¿Seguís usando el escaner?") ){scanear();}
+		}else{
+		console.log('Arrancó la función searchEmpSuccess con datos');
 		//$("#erparticulos").hide();
 		console.log('Entro acá porque existen datos.');
 				for(var x=0; x<results.rows.length; x++){
 					var empresult = results.rows.item(x);
 					//Grabo en la consola el estado de los resultados.
-					console.log('Encontre esto: ' + empresult.descripcion);
+					console.log('Encontre esto: ' + empresult.id);
 
 				var fa = window.localStorage.getItem("fecha");
 				var deo = window.localStorage.getItem("deposito");
 				var dd = window.localStorage.getItem("des_dep");
 		
-				tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.fk_erp_articulos+"', '"+deo+"', '1', '"+fa+"') ");
-				}	    
+				tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '1', '"+fa+"') ");
+				}
+		if(confirm("Dato insertado. ¿Seguís usando el escaner?") ){scanear();}
 		}	
-	}	
-	
-	if(confirm("¿Seguís usando el escaner?") )
-            {scanear();}
+	}
 }
 //Verifico si el usuario definió o no el WS
 function verificarWS(c,m){
@@ -637,13 +643,7 @@ function searchEmpSuccess(tx, results){
 				$("#erpempresassearch").append('<button type="button" onclick="clickMeArticulos(\' '+ empresult.id + ' \', \' '+ empresult.DESCRIPCION +' \', \' '+ empresult.COD_BARRA + '\');" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> '+ empresult.id +' - '+ empresult.DESCRIPCION +' ['+ empresult.COD_BARRA +'] </button>');
 			}
 	}	
-}
-
-
-
-
-
-	
+}	
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
     {
