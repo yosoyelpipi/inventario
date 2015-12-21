@@ -1,8 +1,4 @@
 /* global $ */
-
-
-
-
 var ws;
 var db;
 var user;
@@ -79,7 +75,7 @@ function scanear(){
 			$('#contado').html('<input type="hidden" class="form-control" id="CodBarrasLeido" value="'+codigoQR+'">');
 
 			//Llamo nuevamente al léctor de código de barras.
-			loop('codigoQR');
+			loop(codigoQR);  
         }, 
         //Si no, ejecuta la función error.
         function (error) {
