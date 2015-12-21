@@ -47,7 +47,7 @@ $client = new nusoap_client($ws,true);
 								//Ahora comienzo a recorrer el XML para mostrar los atributos por pantalla.
 								$langs = $array['ROWDATA']['ROW'];
 								$count = sizeof($langs);
-								if($count==''){$counts=0;} 
+								if($count==''){$counts=0;}else{$counts=$count;} 
 								for ($i=0; $i<sizeof($langs); $i++) {							
 if($count == 1){
 				$cadena = $langs['@attributes']['Z_FK_ERP_DEPOSITOS'];
