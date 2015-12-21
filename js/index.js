@@ -10,6 +10,24 @@ var defpass;
 var existe_db;
 var dbcreate;
 var fua_cli;
+//configWS -- Borrador.
+
+//Verifico si el usuario definió o no el WS
+function verificarWS(c,m){
+    ws = window.localStorage.getItem("ws");
+    db = window.localStorage.getItem("db");
+    user = window.localStorage.getItem("user");
+    pass = window.localStorage.getItem("pass");
+    
+    if (!ws){
+        console.log('no definiste el ws, por lo tanto no puedo mostrar el div '+ c);
+        $('#error').show();
+        $('#mgnalert').html('<p class="lead">'+ m +'</p>');
+    }else{
+        console.log('Ok si esta definido.');
+        $('#'+ c +'').show();
+    } 
+}
 
 var app = {
     // Application Constructor
@@ -20,7 +38,9 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
     onDeviceReady: function() {
-		
+
+	verificarWS('configurado', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS para comenzar.');
+	
 	existe_db = window.localStorage.getItem("existe_db");	
 	
 	dbcreate = window.openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
@@ -32,8 +52,7 @@ var app = {
 		console.log("la BD está definida");
 		//cargaDatos();
 		//CargoArticulos();
-	}	
-		
+	}		
 	
 	//Inicializo las notificaciones Push
 	if(PushbotsPlugin.isAndroid()){
@@ -45,8 +64,6 @@ var app = {
         
        //Habilita la función del botón menú.
 	   document.addEventListener("menubutton", onMenuKeyDown, false);
-       
-        verificarWS('configurado', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS para comenzar.');
     }   
 };
 
@@ -157,22 +174,7 @@ function loop(codigo){
 		}	
 	}
 }
-//Verifico si el usuario definió o no el WS
-function verificarWS(c,m){
-    ws = window.localStorage.getItem("ws");
-    db = window.localStorage.getItem("db");
-    user = window.localStorage.getItem("user");
-    pass = window.localStorage.getItem("pass");
-    
-    if ((!ws) || (!db) || (!user) || (!pass) ){
-        console.log('no definiste el ws, por lo tanto no puedo mostrar el div '+ c);
-        $('#error').show();
-        $('#mgnalert').html('<p class="lead">'+ m +'</p>');
-    }else{
-        console.log('Ok si esta definido.');
-        $('#'+ c +'').show();
-    } 
-}
+
 
 function genInventario(){
 //Levanto el ID del depósito seleccionado.
@@ -185,11 +187,11 @@ if(!depo){
 		$('#DesDepoRefresh').html('<span class="label label-success" >' + desDepo + '</span>');
 	}	
     verificarWS('genInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar generar una toma de inventario.');
-    $('#tomaInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();
+    $('#tomaInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();$('#probarWS').hide();
 }
 function tomaInventario(){
     verificarWS('tomaInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelvé toma de inventario.');
-    $('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();
+    $('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();$('#probarWS').hide();
 	
 	//Si tiene depósito seleccionado te dejo hacer el inventario.
 	
@@ -212,7 +214,7 @@ function tomaInventario(){
 }
 function depInventario(){
     verificarWS('depInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar depurar una toma de inventario.');
-    $('#tomaInventario').hide();$('#genInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();
+    $('#tomaInventario').hide();$('#genInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();$('#probarWS').hide();
 }
 function configWS(){
     ws = window.localStorage.getItem("ws");
@@ -229,7 +231,7 @@ function configWS(){
 }
 function helpNow(){
     verificarWS('helpNow', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar depurar una toma de inventario.');
-    $('#tomaInventario').hide();$('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#configurado').hide();
+    $('#tomaInventario').hide();$('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#configurado').hide();$('#probarWS').hide();
 }
 
 
@@ -278,7 +280,7 @@ function submitForm(){
 
 function probarWS(){
     $('#probarWS').show();
-	
+	$('#tomaInventario').hide();$('#genInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#configurado').hide();
     defws = window.localStorage.getItem("ws");
 	defdb = window.localStorage.getItem("db");
 	defuser = window.localStorage.getItem("user");
