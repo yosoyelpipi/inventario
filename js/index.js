@@ -10,24 +10,11 @@ var defpass;
 var existe_db;
 var dbcreate;
 var fua_cli;
+var Articulo;
+var CantidadIngresada;
 //configWS -- Borrador.
 
-//Verifico si el usuario definió o no el WS
-function verificarWS(c,m){
-    ws = window.localStorage.getItem("ws");
-    db = window.localStorage.getItem("db");
-    user = window.localStorage.getItem("user");
-    pass = window.localStorage.getItem("pass");
-    
-    if (!ws){
-        console.log('no definiste el ws, por lo tanto no puedo mostrar el div '+ c);
-        $('#error').show();
-        $('#mgnalert').html('<p class="lead">'+ m +'</p>');
-    }else{
-        console.log('Ok si esta definido.');
-        $('#'+ c +'').show();
-    } 
-}
+
 
 var app = {
     // Application Constructor
@@ -67,6 +54,23 @@ var app = {
     }   
 };
 
+//Verifico si el usuario definió o no el WS
+function verificarWS(c,m){
+    ws = window.localStorage.getItem("ws");
+    db = window.localStorage.getItem("db");
+    user = window.localStorage.getItem("user");
+    pass = window.localStorage.getItem("pass");
+    
+    if (!ws){
+        console.log('no definiste el ws, por lo tanto no puedo mostrar el div '+ c);
+        $('#error').show();
+        $('#mgnalert').html('<p class="lead">'+ m +'</p>');
+    }else{
+        console.log('Ok si esta definido.');
+        $('#'+ c +'').show();
+    } 
+}
+
 //Botón atrás
 function onBackKeyDown() {
             if( confirm("Realmente desea salir de la aplicación?") )
@@ -100,6 +104,8 @@ function scanear(){
         }
     );
 };
+
+
 
 /*
 Graba pedidos
@@ -233,7 +239,7 @@ function tomaInventario(){
 	}else{
 		$('#TomaDeInventario').html('<button type="button" onClick="CargoArticulos()" class="btn btn-success btn-lg btn-block"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> Actualizar artículos</button><br> ' +
 									'<button type="button" onClick="scanear()" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Por código de barras</button>' +
-									'<button type="button" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>');
+									'<button type="button" onclick="ingresarCod()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Por código de artículo</button>');
 		$('#DesDepo').html('<span class="label label-success" >' + desDepo + '</span>');
 	}
 	
@@ -637,10 +643,10 @@ function searchEmpresas(){
 function searchEmp(tx){
 	var searchEmpresa = $("#searchclient").val();
 	
-	/*if(!searchEmpresa){
+	if(!searchEmpresa){
 		alert('Tenés que ingresar un valor para iniciar la búsqueda de empresas');
 		return;
-	}*/
+	}
 	
 	console.log("Cargando clientes ::: "+searchEmpresa+" :::de la base de datos.");
 	tx.executeSql('select * from erp_articulos where id like(\'%'+ searchEmpresa +'%\') or COD_BARRA like(\'%'+ searchEmpresa +'%\') ', [], searchEmpSuccess, errorDB);
@@ -666,12 +672,81 @@ function searchEmpSuccess(tx, results){
 				$("#erpempresassearch").show();
 				//Grabo en la consola el estado de los resultados.
 				console.log('Encontre esto: ' + empresult.DESCRIPCION);
-//if(!empresult.COD_BARRA){var = COD_BARRA = "S/C";}else{var = COD_BARRA = empresult.COD_BARRA;}				
+			
 				//Imprimo los resultados encontrados.
 				$("#erpempresassearch").append('<button type="button" onclick="clickMeArticulos(\' '+ empresult.id + ' \', \' '+ empresult.DESCRIPCION +' \', \' '+ empresult.COD_BARRA + '\');" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> '+ empresult.id +' - '+ empresult.DESCRIPCION +' ['+ empresult.COD_BARRA +'] </button>');
 			}
 	}	
-}	
+}
+
+/*
+BUSCAR POR CÓDIGO; VALIDAR SI EXISTE Y GRABAR EN LA TOMA DE INVENTARIO.
+*/
+
+function ingresarCod(){
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(searchArt, errorArtDB);
+}
+function searchArt(tx){
+	var artContado = prompt("Ingresá el código de artículo", "");
+	if (artContado != null){
+		console.log('Ingreso algo distinto de NULL, parece un número, mirá: ' + artContado);
+		Articulo = artContado;
+		console.log("Buscando artículos => "+Articulo+" <= de la base de datos.");
+		tx.executeSql('select * from erp_articulos where id ="'+ Articulo +'" ', [], searchCodSuccess, errorCodDB);	
+	}else{
+		console.log('Ingresó algo parecido a NULL: '+ artContado);
+		Articulo = artContado;
+	}	
+}
+function searchCodSuccess(tx, results){
+	if(results.rows.length == 0){
+		console.log("No hay resultados para la busqueda (" + Articulo + ")seleccionada.");
+		alert("No hay resultados para la busqueda (" + Articulo + ") seleccionada.");
+	}else{	
+	console.log('Encontré dato, linea: 707');
+	CantidadIngresada = prompt("Ingresá la cantidad para el artículo " + Articulo, "");
+	if (CantidadIngresada != ''){
+			var fechia = window.localStorage.getItem("fecha");
+			var deposi = window.localStorage.getItem("deposito");
+			var descripdepo = window.localStorage.getItem("des_dep");
+tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('"+Articulo+"','"+deposi +"', '1', '"+fechia+"') ", [], grabarSuccess, errorDB);
+		}else{
+			console.log('No ingresaste ningún dato operación abortada.');
+			alert('No ingresaste ningún dato operación abortada.');
+		}
+	}	
+}
+
+function grabarSuccess(){
+	console.log('Exitos');
+	console.log("inserté linea para migrar");
+	console.log('Ingresaste el siguiente artículo: '+ Articulo + 'y la cantidad que contaste es ' + CantidadIngresada);			
+	alert('Ingresaste el siguiente artículo: '+ Articulo + ' y la cantidad que contaste es ' + CantidadIngresada);	
+}
+
+function grabaArtiSuccess(){
+	console.log('Exitos');
+	console.log("inserté linea para migrar");
+	console.log('Ingresaste el siguiente artículo: '+ Articulo + 'y la cantidad que contaste es ' + CantidadIngresada);			
+	alert('Ingresaste el siguiente artículo: '+ Articulo + ' y la cantidad que contaste es ' + CantidadIngresada);
+	}
+
+function errorArtiDB(err){
+	console.log('Errores a morir');
+	console.log("Error al intentar grabar artículos por código: " + err.message);
+	alert("Error al intentar grabar artículos por código: " + err.message);	
+}
+function errorCodDB(){
+	alert('Error...errorCodDB().');
+}
+function errorArtDB(err){
+	//alert('Errores...errorArtDB().');
+	console.log(err.message);
+	alert(err.message);		
+}
+
+	
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
     {
