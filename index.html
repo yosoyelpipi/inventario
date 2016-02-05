@@ -41,8 +41,20 @@
       #conectando{display:none;}
 	  #conectandonos{display:none;}
 	  #estadoSync{display:none;}
+      #todosloscontados{display:none;}
 	  #leo{display:none;}
-    </style>	
+    </style>
+      <script lenguaje="javascript">
+          $('.link').live('tap', function() {
+              url = $(this).attr("rel");
+              loadURL(url);
+          });
+
+          function loadURL(url){
+              navigator.app.loadUrl(url, { openExternal:true });
+              return false;
+          }
+      </script>
   </head>
 
   <body>
@@ -73,7 +85,7 @@
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Ayuda</li>
                 <li><a href="javascript:helpNow()"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> ¿Cómo empezar?</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Soporte en línea</a></li>
+                <li><a href='#' class='link' rel='http://ayuda.itris.com.ar'><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Soporte en línea</a></li>
               </ul>
             </li><!--class="active"-->
           </ul>
@@ -100,7 +112,7 @@
       <p class="lead">Tenemos todo listo para comenzar a trabajar</p>
       <button type="button" onClick="genInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Generación de inventario</button>
       <button type="button" onClick="tomaInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-barcode" aria-hidden="true"></span> Toma de inventario</button>
-      <button type="button" onClick="depInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depuración</button>      
+      <button type="button" onClick="depInventario()" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Informes</button>
 	  <center><div id="estadoSync"><img src="img/juego-chrome.gif" width="95%"><br><br></div></center>
 	</div>
 <!--FIN INDEX Bienvenida-->
@@ -150,12 +162,34 @@
       <div class="page-header">
         <h1>Informes de inventario</h1>
       </div>
-      <p class="lead">Toma parcial de inventario</p>
+      <p class="lead">Toma parcial de mi inventario</p>
 	  <input type="text" class="form-control" id="searchclient" placeholder="Buscar Art; cod. barras" autofocus>
-	  <button type="button" onclick="searchEmpresas();" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Aplicar</button>
-	  <button type="button" onclick="loop('9789871347155');" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> CON</button>
-	  <button type="button" onclick="loop();" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> SIN</button>
-	  <div id="erpempresassearch"></div>
+        <br>
+        <button type="button" onclick="muestroFiltrando();" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Aplicar</button>
+        <button type="button" onclick="muestroTodo();" class="btn btn-default"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Todo</button>
+        <button type="button" onclick="cleanerTodo();" class="btn btn-danger"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Limpiar</button>
+        <!--<button type="button" onclick="loop('9789871347155');" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> CON</button>
+	  <button type="button" onclick="loop();" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> SIN</button>-->
+	    <br>
+        <div id="erpempresassearch"></div>
+        <br>
+        <div id="todosloscontados">
+            <div class="alert alert-success" role="alert"><small>Por un tema de seguridad no permitimos que puedas modificar las cantidades ingresadas.</small></div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Artículo</th>
+                    <th>ID depósito</th>
+                    <th>Cantidad</th>
+                </tr>
+                </thead>
+                <tbody id="contadoLocal">
+
+                </tbody>
+            </table>
+            <div id="total"></div>
+        </div>
 	  
     </div><!-- FIN DEPURAR TOMA DE INVENTARIO -->
 

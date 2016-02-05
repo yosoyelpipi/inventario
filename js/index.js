@@ -706,14 +706,14 @@ function searchCodSuccess(tx, results){
 	}else{	
 	console.log('Encontré dato, linea: 707');
 	CantidadIngresada = prompt("Ingresá la cantidad para el artículo " + Articulo, "");
-	if (CantidadIngresada != ''){
+		if (CantidadIngresada == '') {
+			console.log('No ingresaste ninguna cantidad. ¡Operación abortada!');
+			alert('No ingresaste ninguna cantidad. ¡Operación abortada!');
+		} else {
 			var fechia = window.localStorage.getItem("fecha");
 			var deposi = window.localStorage.getItem("deposito");
 			var descripdepo = window.localStorage.getItem("des_dep");
-tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('"+Articulo+"','"+deposi +"', '1', '"+fechia+"') ", [], grabarSuccess, errorDB);
-		}else{
-			console.log('No ingresaste ningún dato operación abortada.');
-			alert('No ingresaste ningún dato operación abortada.');
+			tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('" + Articulo + "','" + deposi + "', '" + CantidadIngresada + "', '" + fechia + "') ", [], grabarSuccess, errorDB);
 		}
 	}	
 }
@@ -746,7 +746,135 @@ function errorArtDB(err){
 	alert(err.message);		
 }
 
-	
+
+//Muestro el inventario de todolo conté hasta el momento.
+function muestroTodo(){
+	console.log('Acá vamos a mostrar todo lo que el tipo contó.');
+	searchAll();
+
+	function searchAll(){
+		console.log('Arrancó la función searchAll');
+		var dbe = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+		dbe.transaction(searchAllArt, errorDB);
+	}
+	function searchAllArt(tx){
+		console.log('Arrancó la función searchAllArt');
+		/*var codigo = $("#searchclient").val();
+		if(!codigo){
+			alert('Tenés que ingresar un valor para iniciar la búsqueda');
+			return;
+		}*/
+		//console.log("Buscando código de artículo ::: "+codigo+" ::: de la base de datos de la aplicación.");
+		tx.executeSql('select * from erp_inventario', [], searchAllSuccess, errorDB);
+	}
+
+
+	function searchAllSuccess(tx, results){
+		console.log('Arrancó la función searchEmpSuccess');
+		if(results.rows.length == 0){
+			var mns = 'No hay resultados guardados aún.';
+			console.log(mns);
+			alert(mns);
+		}else{
+			console.log('Arrancó la función searchAllEmpSuccess con datos');
+			//$("#erparticulos").hide();
+			console.log('Entro acá porque existen datos.');
+
+			//Pongo visible el DIV que recibe los datos de todos los artículos.
+			$("#todosloscontados").show();
+			//$("#todosloscontados").show();
+			$("#contadoLocal").html('');
+
+			document.getElementById("searchclient").value='';
+
+			for(var x=0; x<results.rows.length; x++){
+				var empresult = results.rows.item(x);
+
+				//Grabo en la consola el estado de los resultados.
+				console.log('Encontre esto: ' + empresult.ID);
+
+				var fa = window.localStorage.getItem("fecha");
+				var deo = window.localStorage.getItem("deposito");
+				var dd = window.localStorage.getItem("des_dep");
+
+				$('#contadoLocal').append('<tr> ' +
+										'<td>' + empresult.ID + '</td>' +
+										'<td>' + empresult.FK_ERP_ARTICULOS + '</td>' +
+										'<td>' + empresult.FK_ERP_DEPOSITOS +'</td>' +
+										'<td>' + empresult.CANTIDAD +'</td>' +
+									 '</tr>');
+			}
+		}
+	}
+}
+
+//Limpiar el formulario de Todo lo Contado.
+
+function cleanerTodo(){
+	document.getElementById("searchclient").value='';
+	$("#contadoLocal").html('');
+	$("#todosloscontados").hide();
+}
+
+
+
+//Muestro el inventario filtrando por artículo o código de barra.
+function muestroFiltrando(){
+	console.log('Acá vamos a mostrar todo lo que el tipo contó filtrado por artículo');
+	searchFilter();
+
+	function searchFilter(){
+		console.log('Arrancó la función searchFilter');
+		var dbe = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+		dbe.transaction(searchAllArtFil, errorDB);
+	}
+	function searchAllArtFil(tx){
+		console.log('Arrancó la función searchAllArtFill');
+		var codigo = $("#searchclient").val();
+		 if(!codigo){
+		 alert('Tenés que ingresar un valor para iniciar la búsqueda');
+		 return;
+		 }
+		console.log("Buscando este valor ::: "+codigo+" ::: de la base de datos de la aplicación.");
+		tx.executeSql('select * from erp_inventario where FK_ERP_ARTICULOS like(\'%'+ codigo +'%\') ', [], searchAllFilSuccess, errorDB);
+	}
+
+
+	function searchAllFilSuccess(tx, results){
+		console.log('Arrancó la función searchAllFilSuccess');
+		if(results.rows.length == 0){
+			var mns = 'No hay resultados guardados aún.';
+			console.log(mns);
+			alert(mns);
+		}else{
+			console.log('Arrancó la función searchAllEmpSuccess con datos');
+			//$("#erparticulos").hide();
+			console.log('Entro acá porque existen datos.');
+
+			//Pongo visible el DIV que recibe los datos de todos los artículos.
+			$("#todosloscontados").show();
+			$("#contadoLocal").html('');
+
+			for(var x=0; x<results.rows.length; x++){
+				var empresult = results.rows.item(x);
+				//Grabo en la consola el estado de los resultados.
+				console.log('Encontre esto: ' + empresult.ID);
+
+				var fa = window.localStorage.getItem("fecha");
+				var deo = window.localStorage.getItem("deposito");
+				var dd = window.localStorage.getItem("des_dep");
+				$('#contadoLocal').append('<tr> ' +
+					'<td>' + empresult.ID + '</td>' +
+					'<td>' + empresult.FK_ERP_ARTICULOS + '</td>' +
+					'<td>' + empresult.FK_ERP_DEPOSITOS +'</td>' +
+					'<td>' + empresult.CANTIDAD +'</td>' +
+					'</tr>');
+			}
+		}
+	}
+}
+
+
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
     {

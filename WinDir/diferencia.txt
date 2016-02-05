@@ -1,0 +1,51 @@
+function ConvFloat(S: float; L, D: Integer): String;
+begin
+ Result := ItsStringReplace(copy(ItsFStr(S, L, D), 1 , L),' ','0');
+end;
+
+begin
+  if ItsFlCurValue(Delta, 'FEC_DESDE') > ItsFlCurValue(Delta, 'FEC_HASTA') then
+    ItsRollBack('La fecha desde debe ser menor o igual a la fecha hasta');
+
+  RutaArchivo := ItsFlCurValue(Delta, 'UBICACION') + '\RET_SICOSS.TXT';
+  ItsDeleteFile(RutaArchivo);
+
+  Sql := 'select  '+
+         '       E.NUM_DOC, '+
+         '       R.FEC_EMI, '+
+         '       R.NUM_COM, '+
+         '       R.IMPORTE '+
+         'from ERP_RET_VEN R '+
+         'join ERP_TIP_RET I on I.ID = R.FK_ERP_TIP_RET ' +
+         'join ERP_COM_VEN C on C.ID = R.FK_ERP_COM_VEN ' +
+         'join ERP_T_COM_VEN T on T.ID = C.FK_ERP_T_COM_VEN ' +
+         'join ERP_RAZ_SOCIALES P on P.ID = T.FK_ERP_RAZ_SOCIALES ' +
+         'join ERP_EMPRESAS E on E.ID = C.FK_ERP_EMPRESAS  '+
+         'where R.FEC_EMI >= ' + ItsFLasSQLStr(Delta, 'FEC_DESDE') +' and R.FEC_EMI <= ' + ItsFLasSQLStr(Delta, 'FEC_HASTA') + ' ' +
+         '  and R.FK_ERP_TIP_RET = ' + ItsFLasSQLStr(Delta, 'FK_ERP_TIP_RET') + ' and P.ID = ' + ItsFLasSQLStr(Delta, 'FK_ERP_RAZ_SOCIALES');
+  ItsWriteLn(Sql);
+  dsRet := ItsDsOpenQuery(Sql);
+  LineaTxt := '';
+  
+  //[----Cuit-----][--Fecha-][Nro. certificado][--importe--]
+  //20182561755 19991001 1234567890123400 001000.23
+
+  while not dsRet.Eof do begin
+    NumDoc := ItsFlCurValue(dsRet, 'NUM_DOC');
+    NumDoc := ItsStringReplace(NumDoc, '-', '');
+    NumDoc := ItsStringReplace(NumDoc, '.', '');
+    NumDoc := ItsLeftPadCh(NumDoc, '0', 11);
+
+    if LineaTxt <> '' then
+      LineaTxt := LineaTxt + _NewLine;
+    LineaTxt:= LineaTxt + NumDoc +
+       ItsStringReplace(FormatDateTime('yyyy/mm/dd', ItsFlCurValue(dsRet, 'FEC_EMI')),'/','') +
+       ItsLeftPadCh(ItsFlCurValue(dsRet, 'NUM_COM'), '0', 14)+
+       ItsStringReplace(ConvFloat(ItsFlCurValue(dsRet, 'IMPORTE'), 11, 2), ',', '.');
+       ItsWriteLn(LineaTxt);
+    dsRet.Next;
+  end;
+  ItsDsClose(dsRet);
+
+  ItsSaveFile (RutaArchivo, LineaTxt);
+end
