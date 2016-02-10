@@ -1,4 +1,4 @@
-/* global $ */
+global = $;
 var ws;
 var db;
 var user;
@@ -873,7 +873,163 @@ function muestroFiltrando(){
 		}
 	}
 }
+/*
+function enviarInventario(){
+	var networkState = navigator.connection.type;
+	var states = {};
+	states[Connection.UNKNOWN]  = 'No podemos determinar tu tipo de conexión a una red de datos.';
+	states[Connection.ETHERNET] = 'Estás conectado a la red mediante Ethernet connection, estamos listo para sincronizar los datos.';
+	states[Connection.WIFI]     = 'Estás conectado a la red mediante WiFi, estamos listo para sincronizar los datos.';
+	states[Connection.CELL_2G]  = 'Estás conectado a la red mediante Cell 2G connection, estamos listo para sincronizar los datos.';
+	states[Connection.CELL_3G]  = 'Estás conectado a la red mediante Cell 3G connection, estamos listo para sincronizar los datos.';
+	states[Connection.CELL_4G]  = 'Estás conectado a la red mediante Cell 4G connection, estamos listo para sincronizar los datos.';
+	states[Connection.CELL]     = 'Estás conectado a la red mediante Cell generic connection, podrías experimentar lentitud en la sincronización.';
+	states[Connection.NONE]     = '¡Atención! tu dispositivo no tiene conexion a datos, no podrás sincronizar, sin embargo podrás seguir trabajando de manera offline.';
 
+	if(navigator.network.connection.type == Connection.WIFI){
+		//No tenemos conexión
+		//alert(states[networkState]);
+		var existe = window.localStorage.getItem("ws");
+		if(!existe){
+			alert('Si bien detectamos que tu dispositivo tiene Wi-Fi, parece que aún no definiste los parámetros de conexión. Andá a la sección configuración y volvé por aquí.');
+		}else{
+			$("#sync").show();
+		}
+	}else{
+		// Si tenemos conexión
+		//alert(states[networkState]);
+		alert('Detectamos que no estás conectado a ninguna red Wi-Fi, conectate a alguna red disponible y volvé por acá');
+	}
+}*/
+
+function enviarInventario(){
+	if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?") ){sendAll();}else{alert('Ok, aquí no ha pasado nada.');}
+}
+
+function sendAll(){
+	//alert('Ok comenzaremos a procesar el alta...');
+	muestroTodoEnvio();
+}
+
+//Muestro el inventario de todolo conté hasta el momento.
+function muestroTodoEnvio(){
+	console.log('Acá vamos a mostrar todo lo que el tipo contó.');
+	searchAllSend();
+
+	function searchAllSend(){
+		console.log('Arrancó la función searchAll');
+		var dbe = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+		dbe.transaction(searchAllArtSend, errorDB);
+	}
+	function searchAllArtSend(tx){
+		console.log('Arrancó la función searchAllArt');
+		/*var codigo = $("#searchclient").val();
+		 if(!codigo){
+		 alert('Tenés que ingresar un valor para iniciar la búsqueda');
+		 return;
+		 }*/
+		//console.log("Buscando código de artículo ::: "+codigo+" ::: de la base de datos de la aplicación.");
+		tx.executeSql('select * from erp_inventario', [], searchAllSuccessSend, errorDB);
+	}
+
+
+	function searchAllSuccessSend(tx, results){
+		console.log('Arrancó la función searchEmpSuccess');
+		if(results.rows.length == 0){
+			var mns = 'No hay resultados guardados aún.';
+			console.log(mns);
+			alert(mns);
+		}else{
+			console.log('Arrancó la función searchAllSuccessSend con datos');
+			//$("#erparticulos").hide();
+			console.log('Entro acá porque existen datos.');
+
+			//Pongo visible el DIV que recibe los datos de todos los artículos.
+			$("#sync").show();
+			//$("#todosloscontados").show();
+			$("#sync").html('');
+
+			document.getElementById("searchclient").value='';
+
+			var fa = window.localStorage.getItem("fecha");
+			var deo = window.localStorage.getItem("deposito");
+			var dd = window.localStorage.getItem("des_dep");
+			myArrClone = [];
+			for(var x=0; x<results.rows.length; x++){
+				var invResult = results.rows.item(x);
+
+				//Grabo en la consola el estado de los resultados.
+				console.log('Encontre esto: ' + invResult.ID);
+
+				//myArrClone.push( 'ID:'+invResult.ID +';'+'FK_ERP_ARTICULOS:'+invResult.FK_ERP_ARTICULOS+';FK_ERP_DEPOSITOS:'+invResult.FK_ERP_DEPOSITOS+';CANTIDAD:'+invResult.CANTIDAD+';FECHA:'+invResult.FECHA+' ' );
+				myArrClone.push({"Datos":{"id":invResult.ID,"articulo":invResult.FK_ERP_ARTICULOS, "deposito":invResult.FK_ERP_DEPOSITOS,"cantidad":invResult.CANTIDAD,"fecha":invResult.FECHA}});
+			}
+			console.log(myArrClone);
+			var myJsonString = JSON.stringify(myArrClone);
+			console.log(myJsonString);
+			EnvioTodo(myJsonString);
+		}
+	}
+}
+
+/* Testeo la conexión */
+function EnvioTodo(a){
+	var a;
+	console.log('Estoy enviando esto: '+a);
+
+	ws = window.localStorage.getItem("ws");
+	console.log('WS: '+ws);
+	db = window.localStorage.getItem("db");
+	console.log('Base de datos: '+db);
+	user = window.localStorage.getItem("user");
+	console.log('Usuario: '+user);
+	pass = window.localStorage.getItem("pass");
+	console.log('Pass: '+pass);
+
+	$.getJSON("http://leocondori.com.ar/app/inventario/enviarinventario.php", {string:  a , ws: ws, db: db, user: user, pass: pass}, resultConnInv, "json");
+}
+
+/* Función captura la respuesta del testeo de conexión */
+function resultConnInv(respuesta){
+	if (respuesta.valor == 0){
+		alert('Esta es la cantidad que llegó: '+respuesta.cantidad);
+		alert('Conexión creada con éxito: '+respuesta.contenido);
+		alert('Esta es la fecha: '+respuesta.fecha);
+		alert('Usaste este WS: '+respuesta.ws);
+		alert('Esta es la base: '+respuesta.db);
+		alert('Con este usuario: '+respuesta.user);
+		alert('Con esta pass: '+respuesta.pass);
+		alert('Este es el resultado del LogOut: '+respuesta.LogOut);
+		alert('Estos son los ID que no pasaron, ojo: '+respuesta.iderr);
+		var myJsonError = JSON.stringify(respuesta.iderr);
+		alert(respuesta.iderr);
+		alert(myJsonError);
+
+		for(var x=0; x<respuesta.OutPutJson.length; x++){
+			//Grabo en la consola el estado de los resultados.
+			console.log('Esto es el ID: '+ respuesta.OutPutJson[x]["ID"]);
+			console.log('Esto es el Motivo: '+ respuesta.OutPutJson[x]["Motivo"]);
+
+// Escribir un archivo de texto
+			window.requestFileSystem(window.LocalFileSystem.PERSISTENT, 0,
+				function (fileSystem) {
+					fileSystem.root.getFile('test.txt', {create: true},
+						function (fileEntry) {
+							fileEntry.createWriter(function (writer) {
+								writer.write('this is only a test');
+								console.log('Grabé algo.');
+							});
+						},
+						onError);
+				},
+				onError);
+		}
+
+	}else{
+		alert('Ocurrió un error '+respuesta.valor);
+		alert('Por este motivo: '+respuesta.motivo);
+	}
+}
 
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)
