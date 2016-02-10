@@ -12,6 +12,7 @@ var dbcreate;
 var fua_cli;
 var Articulo;
 var CantidadIngresada;
+var errorglobales;
 //configWS -- Borrador.
 
 
@@ -903,7 +904,7 @@ function enviarInventario(){
 }*/
 
 function enviarInventario(){
-	if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?") ){sendAll();}else{alert('Ok, aquí no ha pasado nada.');}
+	if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?") ){$('estadoSync').show(); sendAll();}else{alert('Ok, aquí no ha pasado nada.');}
 }
 
 function sendAll(){
@@ -966,7 +967,7 @@ function muestroTodoEnvio(){
 			}
 			console.log(myArrClone);
 			var myJsonString = JSON.stringify(myArrClone);
-			console.log(myJsonString);
+			//console.log(myJsonString);
 			EnvioTodo(myJsonString);
 		}
 	}
@@ -992,37 +993,44 @@ function EnvioTodo(a){
 /* Función captura la respuesta del testeo de conexión */
 function resultConnInv(respuesta){
 	if (respuesta.valor == 0){
-		alert('Esta es la cantidad que llegó: '+respuesta.cantidad);
-		alert('Conexión creada con éxito: '+respuesta.contenido);
-		alert('Esta es la fecha: '+respuesta.fecha);
-		alert('Usaste este WS: '+respuesta.ws);
-		alert('Esta es la base: '+respuesta.db);
-		alert('Con este usuario: '+respuesta.user);
-		alert('Con esta pass: '+respuesta.pass);
-		alert('Este es el resultado del LogOut: '+respuesta.LogOut);
-		alert('Estos son los ID que no pasaron, ojo: '+respuesta.iderr);
-		var myJsonError = JSON.stringify(respuesta.iderr);
-		alert(respuesta.iderr);
-		alert(myJsonError);
+		$('#estadoSync').hide();
+		//alert('Esta es la cantidad que llegó: '+respuesta.cantidad);
+		//alert('Conexión creada con éxito: '+respuesta.contenido);
+		//alert('Esta es la fecha: '+respuesta.fecha);
+		//alert('Usaste este WS: '+respuesta.ws);
+		//alert('Esta es la base: '+respuesta.db);
+		//alert('Con este usuario: '+respuesta.user);
+		//alert('Con esta pass: '+respuesta.pass);
+		//alert('Este es el resultado del LogOut: '+respuesta.LogOut);
+		//alert('Estos son los ID que no pasaron, ojo: '+respuesta.iderr);
+		//var myJsonError = JSON.stringify(respuesta.iderr);
+		//alert(respuesta.iderr);
+		//alert(myJsonError);
+		if (respuesta.OutPutJson.length > 0){alert('La sincronización terminó pero con algunos errores.');}else{alert('¡Excelente! la sincronización ha finalizado con éxito.');}
+		$('#syncro').show();
+		$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
+			                 '<div class="alert alert-danger" role="alert">Existieron '+respuesta.OutPutJson.length+' errores en la exportación</div>'+
+							 '<button type="button" onclick="DepurarTodo()" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Depurar</button>'+
+							 '<br>');
+		errorglobales = JSON.stringify(respuesta.OutPutJson);
 
-		for(var x=0; x<respuesta.OutPutJson.length; x++){
+		for(var x=0; x<respuesta.OutPutJson.length; x++) {
 			//Grabo en la consola el estado de los resultados.
-			console.log('Esto es el ID: '+ respuesta.OutPutJson[x]["ID"]);
-			console.log('Esto es el Motivo: '+ respuesta.OutPutJson[x]["Motivo"]);
+			console.log('Esto es el ID: ' + respuesta.OutPutJson[x]["ID"]);
+			console.log('Esto es el Motivo: ' + respuesta.OutPutJson[x]["Motivo"]);
 
-// Escribir un archivo de texto
-			window.requestFileSystem(window.LocalFileSystem.PERSISTENT, 0,
-				function (fileSystem) {
-					fileSystem.root.getFile('test.txt', {create: true},
-						function (fileEntry) {
-							fileEntry.createWriter(function (writer) {
-								writer.write('this is only a test');
-								console.log('Grabé algo.');
-							});
-						},
-						onError);
-				},
-				onError);
+			$('#LogError').append('<tr> ' +
+				'<td>' + respuesta.OutPutJson[x]["ID"] + '</td>' +
+				'<td>' + respuesta.OutPutJson[x]["Articulo"] + '</td>' +
+				'<td>' + respuesta.OutPutJson[x]["Cantidad"] + '</td>' +
+				'<td>' + respuesta.OutPutJson[x]["Motivo"] + '</td>' +
+				'</tr>');
+		}
+
+		for(var y=0; y<respuesta.InsertOK.length; y++) {
+			//Grabo en la consola el estado de los resultados.
+			console.log('Esto es el ID: ' + respuesta.InsertOK[y]["ID"]);
+			limpiarmigrado(respuesta.InsertOK[y]["ID"]);
 		}
 
 	}else{
@@ -1030,6 +1038,86 @@ function resultConnInv(respuesta){
 		alert('Por este motivo: '+respuesta.motivo);
 	}
 }
+
+//Función para borrar todos los registros migrados con éxito.
+function limpiarmigrado(a){
+	var a;
+	console.log('Se activó la función limpiarmigrado() y se procede a borrar este ID: '+a);
+	//Borro los datos de la tabla.
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(function(tx) {
+		tx.executeSql("delete from erp_inventario where ID='"+a+"' ");
+	}, errorBorrar, successBorrar);
+
+
+}
+function errorBorrar(err){
+	console.log("Error procesando SQL:" + err.code);
+	alert("Error procesando SQL:" + err.code + '-' + err.message);
+}
+
+function successBorrar(){
+	console.log("Borré los datos insertados en ITRIS.");
+	//navigator.notification.alert('¡Excelente! los registros que fueron insertados en Itris fueron depurados de este dispositivo.', alertCallback, 'Itris inventario dice:', 'Aceptar');
+}
+
+
+//Función para depurar la tabla Toma de inventario, que son los registros que tienen errores.
+
+function DepurarTodo(){
+	console.log('Se activó la función DepurarTodo() y se procede limpiar la tabla ERP_INVENTARIO.');
+
+	//Borro los datos de la tabla.
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(function(tx) {
+		tx.executeSql("delete from erp_inventario");
+	}, errorDepurar, successDepurar);
+
+	console.log('Mirá todos los errores llegaron hasta acá: '+errorglobales);
+
+	enviarmail(errorglobales);
+
+	$('#syncro').html('<div class="alert alert-success" role="alert"><p><b>Depuramos el inventario con éxito.</b></p></div>');
+}
+function errorDepurar(err){
+	console.log("Error procesando SQL:" + err.code);
+	alert("Error procesando SQL:" + err.code + '-' + err.message);
+}
+
+function successDepurar(){
+	console.log("Tabla de inventario depurada con éxito.");
+	//navigator.notification.alert('¡Excelente! los registros que fueron insertados en Itris fueron depurados de este dispositivo.', alertCallback, 'Itris inventario dice:', 'Aceptar');
+}
+
+//Enviar Mail
+function enviarmail(m){
+	var m;
+	console.log('Estoy enviando esto por mail: '+m);
+
+	ws = window.localStorage.getItem("ws");
+	console.log('WS: '+ws);
+	db = window.localStorage.getItem("db");
+	console.log('Base de datos: '+db);
+	user = window.localStorage.getItem("user");
+	console.log('Usuario: '+user);
+	pass = window.localStorage.getItem("pass");
+	console.log('Pass: '+pass);
+
+	$.getJSON("http://leocondori.com.ar/app/inventario/enviarerrores.php", {errores:  m , ws: ws, db: db, user: user, pass: pass}, resultEnvMail, "json");
+}
+
+function resultEnvMail(respuesta){
+	console.log('Este es el resultado del json '+respuesta.valor);
+	console.log('Este es el resultado del json '+respuesta.msn);
+	if (respuesta.valor == 0){
+		$('#syncro').append('<div class="alert alert-success" role="alert"><p><b>'+respuesta.msn+'</b></p></div>');
+	}else{
+		console.log(respuesta.msn);
+		$('#syncro').append('<div class="alert alert-alert" role="alert"><p><b>'+respuesta.msn+'</b></p></div>');
+	}
+
+}
+
 
     //FUCIONES  (ESTE TESTING ANDA)    
    /* function ItsDownloadClientes(respuesta)

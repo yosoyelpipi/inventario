@@ -42,8 +42,9 @@
 	  #conectandonos{display:none;}
 	  #estadoSync{display:none;}
       #todosloscontados{display:none;}
-      #syncc{display:none;}
+      #sync{display:none;}
 	  #leo{display:none;}
+        #syncro{display:none;}
     </style>
       <script lenguaje="javascript">
           $('.link').live('tap', function() {
@@ -160,7 +161,21 @@
         <hr>
         <button type="button" onClick="enviarInventario()" class="btn btn-danger btn-lg btn-block"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Enviar inventario...</button>
         <center><div id="estadoSync"><img src="img/juego-chrome.gif" width="95%"><br><br></div></center>
-        <div id="sync"><hr>
+        <div id="syncro">
+            <hr>
+            <div id="titleerro"></div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Art.</th>
+                    <th>Cant.</th>
+                    <th>Observaciones</th>
+                </tr>
+                </thead>
+                <tbody id="LogError">
+                </tbody>
+            </table>
 
         </div>
 	  
