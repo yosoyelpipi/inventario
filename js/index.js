@@ -904,7 +904,12 @@ function enviarInventario(){
 }*/
 
 function enviarInventario(){
-	if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?") ){$('estadoSync').show(); sendAll();}else{alert('Ok, aquí no ha pasado nada.');}
+	if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
+		$('#leo2').show();
+		sendAll();
+	}else {
+		alert('Ok, aquí no ha pasado nada.');
+	}
 }
 
 function sendAll(){
@@ -993,7 +998,7 @@ function EnvioTodo(a){
 /* Función captura la respuesta del testeo de conexión */
 function resultConnInv(respuesta){
 	if (respuesta.valor == 0){
-		$('#estadoSync').hide();
+		$('#leo2').hide();
 		//alert('Esta es la cantidad que llegó: '+respuesta.cantidad);
 		//alert('Conexión creada con éxito: '+respuesta.contenido);
 		//alert('Esta es la fecha: '+respuesta.fecha);
@@ -1010,7 +1015,7 @@ function resultConnInv(respuesta){
 		$('#syncro').show();
 		$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
 			                 '<div class="alert alert-danger" role="alert">Existieron '+respuesta.OutPutJson.length+' errores en la exportación</div>'+
-							 '<button type="button" onclick="DepurarTodo()" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Depurar</button>'+
+							 '<button type="button" onclick="DepurarTodos()" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depurar</button>'+
 							 '<br>');
 		errorglobales = JSON.stringify(respuesta.OutPutJson);
 
@@ -1064,6 +1069,13 @@ function successBorrar(){
 
 //Función para depurar la tabla Toma de inventario, que son los registros que tienen errores.
 
+function DepurarTodos(){
+	if(confirm("Está apunto de eliminar todos los datos erróneos. ¿Continuar?") ){
+		DepurarTodo();
+	}else{
+		alert('Ok, recuerde que estos datos permanecerán guardados en su dispositivo. No podrá podrá modificarlos.');
+	}
+}
 function DepurarTodo(){
 	console.log('Se activó la función DepurarTodo() y se procede limpiar la tabla ERP_INVENTARIO.');
 
@@ -1077,7 +1089,10 @@ function DepurarTodo(){
 
 	enviarmail(errorglobales);
 
-	$('#syncro').html('<div class="alert alert-success" role="alert"><p><b>Depuramos el inventario con éxito.</b></p></div>');
+	$('#syncro').html('<hr><div class="alert alert-success" role="alert"><p><b>Depuramos el inventario con éxito.</b></p></div>');
+	setTimeout(function() {
+		$("#syncro").fadeOut(1500);
+	},9000);
 }
 function errorDepurar(err){
 	console.log("Error procesando SQL:" + err.code);
@@ -1111,9 +1126,15 @@ function resultEnvMail(respuesta){
 	console.log('Este es el resultado del json '+respuesta.msn);
 	if (respuesta.valor == 0){
 		$('#syncro').append('<div class="alert alert-success" role="alert"><p><b>'+respuesta.msn+'</b></p></div>');
+		setTimeout(function() {
+			$("#syncro").fadeOut(1500);
+		},15000);
 	}else{
 		console.log(respuesta.msn);
-		$('#syncro').append('<div class="alert alert-alert" role="alert"><p><b>'+respuesta.msn+'</b></p></div>');
+		$('#syncro').append('<div class="alert alert-danger" role="alert"><p><b>'+respuesta.msn+'</b></p></div>');
+		setTimeout(function() {
+			$("#syncro").fadeIn(1500);
+		},15000);
 	}
 
 }
