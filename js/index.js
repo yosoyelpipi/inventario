@@ -704,6 +704,7 @@ function searchCodSuccess(tx, results){
 	if(results.rows.length == 0){
 		console.log("No hay resultados para la busqueda (" + Articulo + ")seleccionada.");
 		alert("No hay resultados para la busqueda (" + Articulo + ") seleccionada.");
+		loopTomaArt();
 	}else{	
 	console.log('Encontré dato, linea: 707');
 	CantidadIngresada = prompt("Ingresá la cantidad para el artículo " + Articulo, "");
@@ -722,10 +723,14 @@ function searchCodSuccess(tx, results){
 function grabarSuccess(){
 	console.log('Exitos');
 	console.log("inserté linea para migrar");
-	console.log('Ingresaste el siguiente artículo: '+ Articulo + 'y la cantidad que contaste es ' + CantidadIngresada);			
-	alert('Ingresaste el siguiente artículo: '+ Articulo + ' y la cantidad que contaste es ' + CantidadIngresada);	
+	console.log('Ingresaste el siguiente artículo: '+ Articulo + ' y la cantidad que contaste es ' + CantidadIngresada);
+	alert('Ingresaste el siguiente artículo: '+ Articulo + ' y la cantidad que contaste es ' + CantidadIngresada);
+	loopTomaArt();
 }
 
+function loopTomaArt(){
+	ingresarCod();
+}
 function grabaArtiSuccess(){
 	console.log('Exitos');
 	console.log("inserté linea para migrar");
