@@ -978,6 +978,7 @@ function muestroTodoEnvio(){
 	function searchAllSuccessSend(tx, results){
 		console.log('Arrancó la función searchEmpSuccess');
 		if(results.rows.length == 0){
+			$('#leo2').hide();
 			var mns = 'No hay resultados guardados aún.';
 			console.log(mns);
 			alert(mns);
