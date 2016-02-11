@@ -107,7 +107,18 @@ function scanear(){
 };
 
 
+//Función para saber si el Json está vacío.
+function isEmptyJSON(obj){
+	for(var i in obj) { return false; }
+	return true;
+}
 
+function is_integer(value){
+	for (i = 0 ; i < value.length ; i++) {
+		if ((value.charAt(i) < '0') || (value.charAt(i) > '9')) return false
+	}
+	return true;
+}
 /*
 Graba pedidos
 */
@@ -179,10 +190,21 @@ function loop(codigo){
 					if (person != null) {
 						//document.getElementById("demo").innerHTML =
 						//"Hello " + person + "! How are you today?";
+
 						console.log('Ingreso algo distinto de NULL, parece un número, mirá: ' + person);
 						var cancontado = person;
-						tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '"+cancontado+"', '"+fa+"') ");				
-						if(confirm("Dato ingresado. ¿Seguís usando el escaner?") ){scanear();}
+
+						//validar si una variable es de tipo entero
+						if (is_integer(cancontado)){
+							console.log(cancontado + " es entero");
+							tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '"+cancontado+"', '"+fa+"') ");
+							if(confirm("Dato ingresado. ¿Seguís usando el escaner?") ){scanear();}
+						}else{
+							alert (cancontado + " no parece ser un código de barras. Operación abortada.");
+							scanear();
+						}
+
+
 					}else{
 						console.log('Ingresó algo parecido a NULL: '+ person);
 						var cancontado = person;
@@ -715,7 +737,16 @@ function searchCodSuccess(tx, results){
 			var fechia = window.localStorage.getItem("fecha");
 			var deposi = window.localStorage.getItem("deposito");
 			var descripdepo = window.localStorage.getItem("des_dep");
-			tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('" + Articulo + "','" + deposi + "', '" + CantidadIngresada + "', '" + fechia + "') ", [], grabarSuccess, errorDB);
+			//validar si una variable es de tipo entero
+			if (is_integer(CantidadIngresada)){
+				console.log(CantidadIngresada + " es entero");
+				tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('" + Articulo + "','" + deposi + "', '" + CantidadIngresada + "', '" + fechia + "') ", [], grabarSuccess, errorDB);
+			}else{
+				alert (CantidadIngresada + " no parece ser un número entero. Operación abortada.");
+				loopTomaArt();
+			}
+
+
 		}
 	}	
 }
@@ -1016,25 +1047,42 @@ function resultConnInv(respuesta){
 		//var myJsonError = JSON.stringify(respuesta.iderr);
 		//alert(respuesta.iderr);
 		//alert(myJsonError);
-		if (respuesta.OutPutJson.length > 0){alert('La sincronización terminó pero con algunos errores.');}else{alert('¡Excelente! la sincronización ha finalizado con éxito.');}
-		$('#syncro').show();
-		$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
-			                 '<div class="alert alert-danger" role="alert">Existieron '+respuesta.OutPutJson.length+' errores en la exportación</div>'+
-							 '<button type="button" onclick="DepurarTodos()" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depurar</button>'+
-							 '<br>');
-		errorglobales = JSON.stringify(respuesta.OutPutJson);
+		var jsonResul = isEmptyJSON(respuesta.OutPutJson);
+		console.log('Esta vacío si o no '+jsonResul);
 
-		for(var x=0; x<respuesta.OutPutJson.length; x++) {
-			//Grabo en la consola el estado de los resultados.
-			console.log('Esto es el ID: ' + respuesta.OutPutJson[x]["ID"]);
-			console.log('Esto es el Motivo: ' + respuesta.OutPutJson[x]["Motivo"]);
+		if (jsonResul==false){
+			alert('La sincronización terminó pero con algunos errores.');
+			$('#syncro').show();
 
-			$('#LogError').append('<tr> ' +
-				'<td>' + respuesta.OutPutJson[x]["ID"] + '</td>' +
-				'<td>' + respuesta.OutPutJson[x]["Articulo"] + '</td>' +
-				'<td>' + respuesta.OutPutJson[x]["Cantidad"] + '</td>' +
-				'<td>' + respuesta.OutPutJson[x]["Motivo"] + '</td>' +
-				'</tr>');
+			$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
+				'<div class="alert alert-danger" role="alert">Existieron '+respuesta.OutPutJson.length+' errores en la exportación</div>'+
+				'<button type="button" onclick="DepurarTodos()" class="btn btn-warning"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Depurar</button>'+
+				'<br>');
+			$('#soloerror').show();
+			errorglobales = JSON.stringify(respuesta.OutPutJson);
+
+			for(var x=0; x<respuesta.OutPutJson.length; x++) {
+				//Grabo en la consola el estado de los resultados.
+				console.log('Esto es el ID: ' + respuesta.OutPutJson[x]["ID"]);
+				console.log('Esto es el Motivo: ' + respuesta.OutPutJson[x]["Motivo"]);
+
+				$('#LogError').append('<tr> ' +
+					'<td>' + respuesta.OutPutJson[x]["ID"] + '</td>' +
+					'<td>' + respuesta.OutPutJson[x]["Articulo"] + '</td>' +
+					'<td>' + respuesta.OutPutJson[x]["Cantidad"] + '</td>' +
+					'<td>' + respuesta.OutPutJson[x]["Motivo"] + '</td>' +
+					'</tr>');
+			}
+
+		}else{
+			alert('¡Excelente! la sincronización ha finalizado con éxito.');
+			$('#syncro').show();
+			$('#soloerror').hide();
+			$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
+				'<br>');
+			setTimeout(function() {
+				$("#syncro").fadeOut(1500);
+			},9000);
 		}
 
 		for(var y=0; y<respuesta.InsertOK.length; y++) {

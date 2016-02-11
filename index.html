@@ -46,6 +46,7 @@
 	  #leo{display:none;}
       #leo2{display:none;}
         #syncro{display:none;}
+        #soloerror{display:none;}
     </style>
       <script lenguaje="javascript">
           $('.link').live('tap', function() {
@@ -170,19 +171,20 @@
         <div id="syncro">
             <hr>
             <div id="titleerro"></div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Art.</th>
-                    <th>Cant.</th>
-                    <th>Observaciones</th>
-                </tr>
-                </thead>
-                <tbody id="LogError">
-                </tbody>
-            </table>
-
+            <div id="soloerror">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Art.</th>
+                        <th>Cant.</th>
+                        <th>Observaciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="LogError">
+                    </tbody>
+                </table>
+            </div>
         </div>
 	  
     </div><!-- FIN TOMA DE INVENTARIO -->
