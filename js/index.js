@@ -1082,15 +1082,18 @@ function resultConnInv(respuesta){
 			$('#titleerro').html('<div class="alert alert-success" role="alert">'+respuesta.CantidadOk+' registros ingresados correctamente.</div>'+
 				'<br>');
 			setTimeout(function() {
-				$("#syncro").fadeOut(1500);
+				$("#titleerro").fadeOut(1500);
 			},9000);
+
+			for(var y=0; y<respuesta.InsertOK.length; y++) {
+				//Grabo en la consola el estado de los resultados.
+				console.log('Esto es el ID: ' + respuesta.InsertOK[y]["ID"]);
+				limpiarmigrado(respuesta.InsertOK[y]["ID"]);
+			}
+
 		}
 
-		for(var y=0; y<respuesta.InsertOK.length; y++) {
-			//Grabo en la consola el estado de los resultados.
-			console.log('Esto es el ID: ' + respuesta.InsertOK[y]["ID"]);
-			limpiarmigrado(respuesta.InsertOK[y]["ID"]);
-		}
+
 
 	}else{
 		alert('Ocurrió un error '+respuesta.valor);
