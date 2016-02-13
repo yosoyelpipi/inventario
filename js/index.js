@@ -233,17 +233,29 @@ function successIngreso(){
 }*/
 
 function genInventario(){
-//Levanto el ID del depósito seleccionado.
-	var depo = window.localStorage.getItem("deposito");	
-	var desDepo = window.localStorage.getItem("des_dep");	
-	
-if(!depo){
-		$('#DesDepoRefresh').html('<span class="label label-danger" >Sin definir</span>');
+
+var hayWiFi=validateConnection();
+
+	if(hayWiFi == true) {
+	//Levanto el ID del depósito seleccionado.
+		var depo = window.localStorage.getItem("deposito");
+		var desDepo = window.localStorage.getItem("des_dep");
+
+		if (!depo) {
+			$('#DesDepoRefresh').html('<span class="label label-danger" >Sin definir</span>');
+		} else {
+			$('#DesDepoRefresh').html('<span class="label label-success" >' + desDepo + '</span>');
+		}
+		verificarWS('genInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar generar una toma de inventario.');
+		$('#tomaInventario').hide();
+		$('#depInventario').hide();
+		$('#configWS').hide();
+		$('#helpNow').hide();
+		$('#configurado').hide();
+		$('#probarWS').hide();
 	}else{
-		$('#DesDepoRefresh').html('<span class="label label-success" >' + desDepo + '</span>');
-	}	
-    verificarWS('genInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelve a intentar generar una toma de inventario.');
-    $('#tomaInventario').hide();$('#depInventario').hide();$('#configWS').hide();$('#helpNow').hide();$('#configurado').hide();$('#probarWS').hide();
+		alert('No estás conectado a ninguna red WiFi. Conectate a una y volvé por acá.');
+	}
 }
 function tomaInventario(){
     verificarWS('tomaInventario', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS y vuelvé toma de inventario.');
@@ -562,13 +574,17 @@ function validateConnection(){
 
 //************* ARTICULOS *************	
 	function CargoArticulos(){
-	$("#leo").show();
-	
-       var WebService = window.localStorage.getItem("ws");
-	   var BaseDeDatos = window.localStorage.getItem("db");
-	   var Usuario = window.localStorage.getItem("user");
-	   var Clave = window.localStorage.getItem("pass");
-	   
+
+		var hayWiFi = validateConnection();
+
+		if(hayWiFi == true){
+			$("#leo").show();
+
+			var WebService = window.localStorage.getItem("ws");
+			var BaseDeDatos = window.localStorage.getItem("db");
+			var Usuario = window.localStorage.getItem("user");
+			var Clave = window.localStorage.getItem("pass");
+
 			//Para la pimera ejecución, entonces controlo si está declarada o no.
 			var fua_cli = window.localStorage.getItem("fua_cli");
 			if(!fua_cli){
@@ -576,7 +592,11 @@ function validateConnection(){
 			}else{
 				var fec_ult_act_cli = fua_cli;
 			}
-				$.getJSON("http://leocondori.com.ar/app/inventario/down_art.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave, fua_cliente: fec_ult_act_cli}, ItsDownloadClient, "json");
+			$.getJSON("http://leocondori.com.ar/app/inventario/down_art.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave, fua_cliente: fec_ult_act_cli}, ItsDownloadClient, "json");
+		}else{
+			alert('Tu dispositivo no está conectado a ninguna red WiFi. No podemos continuar.');
+		}
+
 	}
 //FIN: Sincronizo clientes
 
