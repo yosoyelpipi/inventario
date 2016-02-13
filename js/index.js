@@ -985,23 +985,15 @@ function enviarInventario(){
 
 function enviarInventario(){
 
-	var tieneWiFi = validateConnection();
+	var tienesWifi = validateConnection();
 
-	if(tieneWifi==true){
-
-		var existe = window.localStorage.getItem("ws");
-		if(!existe){
-			alert('Si bien detectamos que tu dispositivo tiene Wi-Fi, parece que aún no definiste los parámetros de conexión. Andá a la sección configuración y volvé por aquí.');
-		}else{
+	if(tienesWifi == true){
 			if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
 				$('#leo2').show();
 				sendAll();
 			}else{
 				alert('Ok, aquí no ha pasado nada.');
 			}
-
-		}
-
 	}else{
 		alert('Tu dispositivo no está conectado a ninguna red Wi-Fi. Debés estar conectado para enviar datos.');
 	}
