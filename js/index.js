@@ -633,7 +633,7 @@ function crearEmpresa(tx){
 						console.log('Fecha de última actualización:' + Response.ItsGetDate);							
 						
 						}						
-						//$("#instala").fadeOut(10000);						
+						$("#instala").fadeOut(9000);
 					}else{						
 						fua_cli = window.localStorage.getItem("fua_cli");
                         showAlert();
@@ -950,9 +950,8 @@ function muestroFiltrando(){
 				var deo = window.localStorage.getItem("deposito");
 				var dd = window.localStorage.getItem("des_dep");
 				$('#contadoLocal').append('<tr> ' +
-					'<td>' + empresult.ID + '</td>' +
 					'<td>' + empresult.FK_ERP_ARTICULOS + '</td>' +
-					'<td>' + empresult.FK_ERP_DEPOSITOS +'</td>' +
+					'<td>' + empresult.DESC_DEPOSITOS +'</td>' +
 					'<td>' + empresult.CANTIDAD +'</td>' +
 					'</tr>');
 			}
