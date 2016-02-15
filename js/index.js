@@ -197,7 +197,9 @@ function loop(codigo){
 						//validar si una variable es de tipo entero
 						if (is_integer(cancontado)){
 							console.log(cancontado + " es entero");
-							tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '"+cancontado+"', '"+fa+"') ");
+							var descripdepo = window.localStorage.getItem("des_dep");
+
+							tx.executeSql("INSERT INTO erp_inventario (FK_ERP_ARTICULOS, FK_ERP_DEPOSITOS, DESC_DEPOSITOS, CANTIDAD, FECHA) VALUES ('"+empresult.id+"', '"+deo+"', '"+descripdepo+"', '"+cancontado+"', '"+fa+"') ");
 							if(confirm("Dato ingresado. ¿Seguís usando el escaner?") ){scanear();}
 						}else{
 							alert (cancontado + " no parece ser un código de barras. Operación abortada.");
@@ -235,6 +237,7 @@ function successIngreso(){
 function genInventario(){
 
 var hayWiFi=validateConnection();
+//var hayWiFi = true;
 
 	if(hayWiFi == true) {
 	//Levanto el ID del depósito seleccionado.
@@ -513,6 +516,7 @@ function creaNuevaDB(tx){
 	          "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			  "FK_ERP_ARTICULOS VARCHAR(15)," +
 			  "FK_ERP_DEPOSITOS VARCHAR(15)," +
+		      "DESC_DEPOSITOS VARCHAR(60)," +
 			  "CANTIDAD VARCHAR(10)," +
 			  "FECHA DATE )";			  
 	tx.executeSql(sql);
@@ -576,7 +580,7 @@ function validateConnection(){
 	function CargoArticulos(){
 
 		var hayWiFi = validateConnection();
-
+		//var hayWiFi = true;
 		if(hayWiFi == true){
 			$("#leo").show();
 
@@ -781,10 +785,11 @@ function searchCodSuccess(tx, results){
 			var fechia = window.localStorage.getItem("fecha");
 			var deposi = window.localStorage.getItem("deposito");
 			var descripdepo = window.localStorage.getItem("des_dep");
+
 			//validar si una variable es de tipo entero
 			if (is_integer(CantidadIngresada)){
 				console.log(CantidadIngresada + " es entero");
-				tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, cantidad, fecha)values('" + Articulo + "','" + deposi + "', '" + CantidadIngresada + "', '" + fechia + "') ", [], grabarSuccess, errorDB);
+				tx.executeSql("insert into erp_inventario (fk_erp_articulos, fk_erp_depositos, desc_depositos, cantidad, fecha)values('" + Articulo + "','" + deposi + "', '" + descripdepo + "', '" + CantidadIngresada + "', '" + fechia + "') ", [], grabarSuccess, errorDB);
 			}else{
 				alert (CantidadIngresada + " no parece ser un número entero. Operación abortada.");
 				loopTomaArt();
@@ -846,7 +851,7 @@ function muestroTodo(){
 			return;
 		}*/
 		//console.log("Buscando código de artículo ::: "+codigo+" ::: de la base de datos de la aplicación.");
-		tx.executeSql('select * from erp_inventario', [], searchAllSuccess, errorDB);
+		tx.executeSql('select desc_depositos, fk_erp_articulos, cantidad from erp_inventario group by desc_depositos, fk_erp_articulos, cantidad', [], searchAllSuccess, errorDB);
 	}
 
 
@@ -872,16 +877,16 @@ function muestroTodo(){
 				var empresult = results.rows.item(x);
 
 				//Grabo en la consola el estado de los resultados.
-				console.log('Encontre esto: ' + empresult.ID);
+				console.log('Encontre esto: ' + empresult.FK_ERP_ARTICULOS);
 
 				var fa = window.localStorage.getItem("fecha");
 				var deo = window.localStorage.getItem("deposito");
 				var dd = window.localStorage.getItem("des_dep");
 
 				$('#contadoLocal').append('<tr> ' +
-										'<td>' + empresult.ID + '</td>' +
+										//'<td>' + empresult.ID + '</td>' +
 										'<td>' + empresult.FK_ERP_ARTICULOS + '</td>' +
-										'<td>' + empresult.FK_ERP_DEPOSITOS +'</td>' +
+										'<td>' + empresult.DESC_DEPOSITOS +'</td>' +
 										'<td>' + empresult.CANTIDAD +'</td>' +
 									 '</tr>');
 			}
@@ -954,38 +959,11 @@ function muestroFiltrando(){
 		}
 	}
 }
-/*
-function enviarInventario(){
-	var networkState = navigator.connection.type;
-	var states = {};
-	states[Connection.UNKNOWN]  = 'No podemos determinar tu tipo de conexión a una red de datos.';
-	states[Connection.ETHERNET] = 'Estás conectado a la red mediante Ethernet connection, estamos listo para sincronizar los datos.';
-	states[Connection.WIFI]     = 'Estás conectado a la red mediante WiFi, estamos listo para sincronizar los datos.';
-	states[Connection.CELL_2G]  = 'Estás conectado a la red mediante Cell 2G connection, estamos listo para sincronizar los datos.';
-	states[Connection.CELL_3G]  = 'Estás conectado a la red mediante Cell 3G connection, estamos listo para sincronizar los datos.';
-	states[Connection.CELL_4G]  = 'Estás conectado a la red mediante Cell 4G connection, estamos listo para sincronizar los datos.';
-	states[Connection.CELL]     = 'Estás conectado a la red mediante Cell generic connection, podrías experimentar lentitud en la sincronización.';
-	states[Connection.NONE]     = '¡Atención! tu dispositivo no tiene conexion a datos, no podrás sincronizar, sin embargo podrás seguir trabajando de manera offline.';
-
-	if(navigator.network.connection.type == Connection.WIFI){
-		//No tenemos conexión
-		//alert(states[networkState]);
-		var existe = window.localStorage.getItem("ws");
-		if(!existe){
-			alert('Si bien detectamos que tu dispositivo tiene Wi-Fi, parece que aún no definiste los parámetros de conexión. Andá a la sección configuración y volvé por aquí.');
-		}else{
-			$("#sync").show();
-		}
-	}else{
-		// Si tenemos conexión
-		//alert(states[networkState]);
-		alert('Detectamos que no estás conectado a ninguna red Wi-Fi, conectate a alguna red disponible y volvé por acá');
-	}
-}*/
 
 function enviarInventario(){
 
 	var tienesWifi = validateConnection();
+	//var tienesWifi = true;
 
 	if(tienesWifi == true){
 			if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
@@ -1247,21 +1225,3 @@ function resultEnvMail(respuesta){
 	}
 
 }
-
-
-    //FUCIONES  (ESTE TESTING ANDA)    
-   /* function ItsDownloadClientes(respuesta)
-    {
-        if (respuesta.ItsLoginResult == 0){
-            $("#leo").hide();
-			for(x=0; x<respuesta.Data.length; x++) {
-				console.log('Esto es el ID: '+ respuesta.Data[x]["ID"]);
-				console.log('Esto es la descripción de ARTICULOS: '+ respuesta.Data[x]["DESCRIPCION"]);
-			}
-			alert('Preparamos la aplicación para la toma de inventario con éxito.');
-        }else{
-            $("#leo").hide();
-            alert('Existió un error' + respuesta.motivo);
-        }
-    }*/
-//************* ARTICULOS *************
