@@ -27,33 +27,41 @@ var app = {
     },
     onDeviceReady: function() {
 
+		//scanear();
+		//Habilita la función del botón atrás.
+		document.addEventListener("backbutton", onBackKeyDown, false);
+
+		//Habilita la función del botón menú.
+		document.addEventListener("menubutton", onMenuKeyDown, false);
+
 	verificarWS('configurado', 'No tenés configurado los parámetros de conexión. Andá a la sección Parámetros/Configurar WS para comenzar.');
 	
 	existe_db = window.localStorage.getItem("existe_db");	
 	
 	dbcreate = window.openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
 	
-	if(!existe_db){
-	    console.log("la BD es null");
-		creaDB();
-	}else{
-		console.log("la BD está definida");
-		//cargaDatos();
-		//CargoArticulos();
-	}		
-	
-	//Inicializo las notificaciones Push
-	if(PushbotsPlugin.isAndroid()){
-		PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "902461928096");
-	}	
-        //scanear();
-       //Habilita la función del botón atrás.
-	   document.addEventListener("backbutton", onBackKeyDown, false);	 
-        
-       //Habilita la función del botón menú.
-	   document.addEventListener("menubutton", onMenuKeyDown, false);
+		if(!existe_db){
+			console.log("la BD es null");
+			creaDB();
+		}else{
+			console.log("la BD está definida");
+			//cargaDatos();
+			//CargoArticulos();
+		}
+
+		//Inicializo las notificaciones Push
+		/*if(PushbotsPlugin.isAndroid()){
+		 PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "902461928096");
+		}*/
+
+		var Pushbots = PushbotsPlugin.initialize("56660cab17795947198b4569", {"android":{"sender_id":"902461928096"}});
+
     }   
 };
+
+	Pushbots.on("notification:clicked", function(data){
+		console.log("clicked:" + JSON.stringify(data));
+	});
 
 //Verifico si el usuario definió o no el WS
 function verificarWS(c,m){
@@ -73,7 +81,7 @@ function verificarWS(c,m){
 }
 
 //Botón atrás
-function onBackKeyDown() {
+function onBackKeyDown(){
             if( confirm("Realmente desea salir de la aplicación?") )
             {
                   navigator.app.exitApp();
