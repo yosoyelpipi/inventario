@@ -54,14 +54,15 @@ var app = {
 		 PushbotsPlugin.initializeAndroid("56660cab17795947198b4569", "902461928096");
 		}*/
 
-		var Pushbots = PushbotsPlugin.initialize("56660cab17795947198b4569", {"android":{"sender_id":"902461928096"}});
+		var Pushbots = PushbotsPlugin.initialize("56c23d84177959ab388b4567", {"android":{"sender_id":"902461928096"}});
+
+		Pushbots.on("notification:clicked", function(data){
+			console.log("clicked:" + JSON.stringify(data));
+		});
 
     }   
 };
 
-	Pushbots.on("notification:clicked", function(data){
-		console.log("clicked:" + JSON.stringify(data));
-	});
 
 //Verifico si el usuario definió o no el WS
 function verificarWS(c,m){
