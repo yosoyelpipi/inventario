@@ -827,7 +827,7 @@ function errorCodDB(){
 	alert('Error...errorCodDB().');
 }
 function errorArtDB(err){
-	//alert('Errores...errorArtDB().');
+	//alert('Errores.....errorArtDB().');
 	console.log(err.message);
 	alert(err.message);		
 }
