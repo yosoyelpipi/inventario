@@ -477,7 +477,7 @@ function defDeposito(f,d,de){
 	window.localStorage.setItem("des_dep", de);
 	
 	//var dateString = today.format("dd-m-yy");
-    alert('La fecha seleccionada es: '+ f);
+    //alert('La fecha seleccionada es: '+ f);
     //alert('' + d);
     alert('El depósito seleccionado es: ' + de);
 	
@@ -651,19 +651,19 @@ function crearEmpresa(tx){
 							}
 							
 						console.log("Cantidad insertada: "+ Response.Cantidad);
-						$("#instala").html('<span class="label label-default">¡Genial! se han '+ accion +' ' + Response.Data.length + ' registros.</span><br>');
+						$("#instala").html('<span class="label label-default">¡Genial! se han '+ accion + '  ' + Response.Data.length + ' registros.</span><br>');
 						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
 						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
 						console.log('Fecha de última actualización:' + Response.ItsGetDate);							
 						
 						}						
-						$("#instala").fadeOut(9000);
+						//$("#instala").fadeOut(9000);
 					}else{						
 						fua_cli = window.localStorage.getItem("fua_cli");
                         showAlert();
 					
 						//$("#instala").html('<span class="label label-info">Tenés el maestro de empresas actualizado</span><br>');
-						$("#instala").fadeOut(9000);
+						//$("#instala").fadeOut(9000);
 					}
 			}
 		}
