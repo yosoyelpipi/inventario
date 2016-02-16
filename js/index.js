@@ -246,8 +246,8 @@ function successIngreso(){
 
 function genInventario(){
 
-//var hayWiFi=validateConnection();
-var hayWiFi = true;
+var hayWiFi=validateConnection();
+//var hayWiFi = true;
 
 	if(hayWiFi == true) {
 	//Levanto el ID del depósito seleccionado.
@@ -589,8 +589,8 @@ function validateConnection(){
 //************* ARTICULOS *************	
 	function CargoArticulos(){
 
-		//var hayWiFi = validateConnection();
-		var hayWiFi = true;
+		var hayWiFi = validateConnection();
+		//var hayWiFi = true;
 		if(hayWiFi == true){
 			$("#leo").show();
 
@@ -628,35 +628,26 @@ function validateConnection(){
 
 					var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
 					db.transaction(crearEmpresa, errorCB, successArt);
-function crearEmpresa(tx){
-
-
-	var fua_cli = window.localStorage.getItem("fua_cli");
-
-
-							for(x=0; x<Response.Data.length; x++) {
+function crearEmpresa(tx){													
+						for(x=0; x<Response.Data.length; x++) {
 								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
 								console.log('Esto es el DESC: '+ Response.Data[x]["DESCRIPCION"]);
 								console.log('Esto es el COD_BARRA: '+ Response.Data[x]["COD_BARRA"]);
 
-								if(!fua_cli){
-									recibi = Response.Data[x]["ID"];
-									var existeONo = existeEnLaBase();
+								recibi = Response.Data[x]["ID"];
+							var existeONo = existeEnLaBase();
 
-									//Valido si tengo el artículo en mi APP o no.
-									if (existeONo == false){
-										console.log('Como NO existe entro acá para insertar.');
-										tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
-										var accion = 'sincronizado';
-									}else{
-										console.log('Como existe entro acá para updatear.');
-										var accion = 'actualizado';
-										tx.executeSql("UPDATE ERP_ARTICULOS SET id = '" + Response.Data[x]["ID"] + "', DESCRIPCION = '"+Response.Data[x]["DESCRIPCION"]+"', COD_BARRA = '"+Response.Data[x]["COD_BARRA"]+"' where id = '" + Response.Data[x]["ID"] + "' ");
-									}
-								}else{
+								//Valido si tengo el artículo en mi APP o no.
+								if (existeONo == false){
 									console.log('Como NO existe entro acá para insertar.');
 									tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
+									var accion = 'sincronizado';
+								}else{
+									console.log('Como existe entro acá para updatear.');
+									var accion = 'actualizado';
+									tx.executeSql("UPDATE ERP_ARTICULOS SET id = '" + Response.Data[x]["ID"] + "', DESCRIPCION = '"+Response.Data[x]["DESCRIPCION"]+"', COD_BARRA = '"+Response.Data[x]["COD_BARRA"]+"' where id = '" + Response.Data[x]["ID"] + "' ");
 								}
+
 							}
 							
 						console.log("Cantidad insertada: "+ Response.Cantidad);
