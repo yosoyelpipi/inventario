@@ -13,6 +13,7 @@ var fua_cli;
 var Articulo;
 var CantidadIngresada;
 var errorglobales;
+var recibi;
 //configWS -- Borrador.
 
 
@@ -245,8 +246,8 @@ function successIngreso(){
 
 function genInventario(){
 
-var hayWiFi=validateConnection();
-//var hayWiFi = true;
+//var hayWiFi=validateConnection();
+var hayWiFi = true;
 
 	if(hayWiFi == true) {
 	//Levanto el ID del depósito seleccionado.
@@ -588,8 +589,8 @@ function validateConnection(){
 //************* ARTICULOS *************	
 	function CargoArticulos(){
 
-		var hayWiFi = validateConnection();
-		//var hayWiFi = true;
+		//var hayWiFi = validateConnection();
+		var hayWiFi = true;
 		if(hayWiFi == true){
 			$("#leo").show();
 
@@ -632,11 +633,25 @@ function crearEmpresa(tx){
 								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
 								console.log('Esto es el DESC: '+ Response.Data[x]["DESCRIPCION"]);
 								console.log('Esto es el COD_BARRA: '+ Response.Data[x]["COD_BARRA"]);
-								tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
+
+								recibi = Response.Data[x]["ID"];
+							var existeONo = existeEnLaBase();
+
+								//Valido si tengo el artículo en mi APP o no.
+								if (existeONo == false){
+									console.log('Como NO existe entro acá para insertar.');
+									tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
+									var accion = 'sincronizado';
+								}else{
+									console.log('Como existe entro acá para updatear.');
+									var accion = 'actualizado';
+									tx.executeSql("UPDATE ERP_ARTICULOS SET id = '" + Response.Data[x]["ID"] + "', DESCRIPCION = '"+Response.Data[x]["DESCRIPCION"]+"', COD_BARRA = '"+Response.Data[x]["COD_BARRA"]+"' where id = '" + Response.Data[x]["ID"] + "' ");
+								}
+
 							}
 							
 						console.log("Cantidad insertada: "+ Response.Cantidad);
-						$("#instala").html('<span class="label label-default">¡Genial! se han sincronizado ' + Response.Data.length + ' registros.</span><br>');
+						$("#instala").html('<span class="label label-default">¡Genial! se han '+ accion +' ' + Response.Data.length + ' registros.</span><br>');
 						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
 						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
 						console.log('Fecha de última actualización:' + Response.ItsGetDate);							
@@ -970,8 +985,8 @@ function muestroFiltrando(){
 
 function enviarInventario(){
 
-	var tienesWifi = validateConnection();
-	//var tienesWifi = true;
+	//var tienesWifi = validateConnection();
+	var tienesWifi = true;
 
 	if(tienesWifi == true){
 			if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
@@ -1231,5 +1246,44 @@ function resultEnvMail(respuesta){
 			$("#syncro").fadeIn(1500);
 		},15000);
 	}
+}
 
+
+//Función para verificar si el artículo recibido por JSON es para insertar o para actualizar.
+function existeEnLaBase(){
+	console.log('Vamos a ver si insertamos o modificamos.');
+	searchFilterExiste();
+
+	function searchFilterExiste(){
+		console.log('Arrancó la función searchFilterExiste');
+		var dbe = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+		dbe.transaction(searchAllArtFilExiste, errorExisteDB);
+	}
+	function searchAllArtFilExiste(tx){
+		console.log('Arrancó la función searchAllArtFillExiste');
+
+		var codigo = recibi;
+		console.log('Recibí esto para consultar ' + codigo);
+		console.log("Buscando este valor ::: " + codigo + " ::: de la base de datos de la aplicación para saber si modifico o agrego.");
+		tx.executeSql("select * from ERP_ARTICULOS where id = '" + codigo + "' ", [], searchAllFilExisteSuccess, errorExisteDB);
+	}
+
+	function searchAllFilExisteSuccess(tx, results){
+		console.log('Arrancó la función searchAllFilExisteSuccess');
+		if(results.rows.length == 0){
+			var mns = 'No está tenés que insertar.';
+			console.log(mns);
+			return false;
+		}else{
+			console.log('Arrancó la función searchAllFilExisteSuccess porque el ID ya existe');
+
+			console.log('Entro acá porque el ID ya existe.');
+			return true;
+		}
+	}
+}
+
+function errorExisteDB(){
+	console.log("Error procesando SQL:"  + err.code + '-' + err.message);
+	alert("Error procesando SQL=> "  + err.code + '-' + err.message);
 }
