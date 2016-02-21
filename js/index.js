@@ -14,6 +14,8 @@ var Articulo;
 var CantidadIngresada;
 var errorglobales;
 var recibi;
+var nuevo;
+var sal;
 //configWS -- Borrador.
 
 
@@ -49,6 +51,15 @@ var app = {
 			//cargaDatos();
 			//CargoArticulos();
 		}
+		nuevo = window.localStorage.getItem("nuevo");
+		if(!nuevo){
+			console.log("Esta APP se inicia por primera vez");
+			window.localStorage.setItem("nuevo", 0);
+		}else{
+			console.log("Este dispositivo ya es conocido");
+			window.localStorage.setItem("nuevo", 1);
+		}
+
 
 		//Inicializo las notificaciones Push
 		/*if(PushbotsPlugin.isAndroid()){
@@ -231,6 +242,8 @@ function sinCantidad(art){
 	console.log('Se canceló el ingreso del artículo '+ art +' porque no ingresaste la cantidad.');
 	if(confirm("Se canceló el ingreso del artículo "+ art +" porque no ingresaste la cantidad. ¿Seguís usando el escaner?") ){scanear();}
 }
+
+
 /*
 function errorIngreso(){
 	console.log('Error desconocido a insertar artículo');
@@ -606,6 +619,7 @@ function validateConnection(){
 			}else{
 				var fec_ult_act_cli = fua_cli;
 			}
+			console.log('ESTOY PIDIENDO MAYORES A ESTA FECHA Y HORA ' + fec_ult_act_cli);
 			$.getJSON("http://leocondori.com.ar/app/inventario/down_art.php", {ws: WebService, base: BaseDeDatos, usuario: Usuario, pass: Clave, fua_cliente: fec_ult_act_cli}, ItsDownloadClient, "json");
 		}else{
 			alert('Tu dispositivo no está conectado a ninguna red WiFi. No podemos continuar.');
@@ -628,42 +642,53 @@ function validateConnection(){
 
 					var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
 					db.transaction(crearEmpresa, errorCB, successArt);
-function crearEmpresa(tx){													
-						for(x=0; x<Response.Data.length; x++) {
-								console.log('Esto es el ID: '+ Response.Data[x]["ID"]);
-								console.log('Esto es el DESC: '+ Response.Data[x]["DESCRIPCION"]);
-								console.log('Esto es el COD_BARRA: '+ Response.Data[x]["COD_BARRA"]);
 
-								recibi = Response.Data[x]["ID"];
-							var existeONo = existeEnLaBase();
 
-								//Valido si tengo el artículo en mi APP o no.
-								if (existeONo == false){
-									console.log('Como NO existe entro acá para insertar.');
+					function crearEmpresa(tx){
+					var nuevos = window.localStorage.getItem("nuevo");
+						fua_cli = window.localStorage.getItem("fua_cli");
+						console.log('ESTO ES NUEVO O NO?: ' + nuevos);
+						if(nuevos == 0){
+							console.log('Como NO existe entro acá para insertar.');
+							for(x=0; x<Response.Data.length; x++){
 									tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+Response.Data[x]["ID"]+"', '"+Response.Data[x]["DESCRIPCION"]+"', '"+Response.Data[x]["COD_BARRA"]+"') ");
 									var accion = 'sincronizado';
-								}else{
-									console.log('Como existe entro acá para updatear.');
-									var accion = 'actualizado';
-									tx.executeSql("UPDATE ERP_ARTICULOS SET id = '" + Response.Data[x]["ID"] + "', DESCRIPCION = '"+Response.Data[x]["DESCRIPCION"]+"', COD_BARRA = '"+Response.Data[x]["COD_BARRA"]+"' where id = '" + Response.Data[x]["ID"] + "' ");
-								}
-
 							}
-							
-						console.log("Cantidad insertada: "+ Response.Cantidad);
-						$("#instala").html('<span class="label label-default">¡Genial! se han '+ accion + '  ' + Response.Data.length + ' registros.</span><br>');
-						window.localStorage.setItem("fua_cli", Response.ItsGetDate);
-						$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
-						console.log('Fecha de última actualización:' + Response.ItsGetDate);							
-						
+							window.localStorage.setItem("nuevo",1);
+						}else{
+							for(x=0; x<Response.Data.length; x++){
+								//Estoy acá porque este dispositivo ya hizo la carga inicial.
+								//Ahora me guardo en una varialbe el ID que recibí desde el servidor en formato Json.
+
+								var idArt = Response.Data[x]["ID"];
+								var descArt = Response.Data[x]["DESCRIPCION"];
+								var codArt = Response.Data[x]["COD_BARRA"];
+
+								//Lo convierto a String.
+								var n = idArt.toString();
+								console.log(idArt);
+								var d = descArt.toString();
+								console.log(descArt);
+								var b = codArt.toString();
+								console.log(codArt);
+								//Ahora le pregunto a esta función si existe o no, en función del resultado hago el UPDATE o el INSERT.
+								successCBUno(n,d,b);
+							}
+						}
+		console.log("Cantidad insertada: "+ Response.Cantidad);
+		$("#instala").html('<span class="label label-default">¡Genial! se ha actualizado ' + Response.Data.length + ' registro/s.</span><br>');
+		window.localStorage.setItem("fua_cli", Response.ItsGetDate);
+						console.log('AHORA LA ÚLTIMA FECHA ES ' + Response.ItsGetDate);
+		$("#instala").append('<span class="label label-success">Fecha de última actualización: ' + Response.ItsGetDate + '</span>');
+		console.log('Fecha de última actualización:' + Response.ItsGetDate);
 						}						
-						//$("#instala").fadeOut(9000);
+						$("#instala").fadeOut(9000);
 					}else{						
 						fua_cli = window.localStorage.getItem("fua_cli");
-                        showAlert();
-					
-						//$("#instala").html('<span class="label label-info">Tenés el maestro de empresas actualizado</span><br>');
-						//$("#instala").fadeOut(9000);
+                        //showAlert();
+						console.log('AHORA LA ÚLTIMA FECHA ES ' + Response.ItsGetDate + ' NO HAY NADA PARA ACTUALIZAR.');
+						$("#instala").html('<span class="label label-info">Tenés el maestro de artículos actualizado</span><br>');
+						$("#instala").fadeOut(9000);
 					}
 			}
 		}
@@ -1249,41 +1274,106 @@ function resultEnvMail(respuesta){
 }
 
 
-//Función para verificar si el artículo recibido por JSON es para insertar o para actualizar.
-function existeEnLaBase(){
-	console.log('Vamos a ver si insertamos o modificamos.');
-	searchFilterExiste();
 
-	function searchFilterExiste(){
-		console.log('Arrancó la función searchFilterExiste');
-		var dbe = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
-		dbe.transaction(searchAllArtFilExiste, errorExisteDB);
+//Uno
+//Pregunto si existe el artículo.
+	function successCBUno(artti,detalle,cod_barra){
+		var artti;
+		var detalle;
+		var cod_barra;
+
+		console.log('Paren Recibí esto:' + artti);
+		console.log('Paren Recibí esto:' + detalle);
+		console.log('Paren Recibí esto:' + cod_barra);
+
+		var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+		db.transaction(function queryDBUno(tx) {
+			tx.executeSql('SELECT * FROM ERP_ARTICULOS where id = "'+ artti +'" ', [], function querySuccessUno(tx, results) {
+
+				if(results.rows.length == 0){
+					console.log('False');
+					insert(artti,detalle,cod_barra);
+				}else{
+					console.log('True');
+					update(artti,detalle,cod_barra);
+				}
+
+			}, function errorCBUno(err) {
+				console.log("Error processing SQL: " + err.code);
+			});
+		}, function errorCBUno(err) {
+			console.log("Error processing SQL: " + err.code);
+		});
 	}
-	function searchAllArtFilExiste(tx){
-		console.log('Arrancó la función searchAllArtFillExiste');
 
-		var codigo = recibi;
-		console.log('Recibí esto para consultar ' + codigo);
-		console.log("Buscando este valor ::: " + codigo + " ::: de la base de datos de la aplicación para saber si modifico o agrego.");
-		tx.executeSql("select * from ERP_ARTICULOS where id = '" + codigo + "' ", [], searchAllFilExisteSuccess, errorExisteDB);
-	}
 
-	function searchAllFilExisteSuccess(tx, results){
-		console.log('Arrancó la función searchAllFilExisteSuccess');
-		if(results.rows.length == 0){
-			var mns = 'No está tenés que insertar.';
-			console.log(mns);
-			return false;
-		}else{
-			console.log('Arrancó la función searchAllFilExisteSuccess porque el ID ya existe');
 
-			console.log('Entro acá porque el ID ya existe.');
-			return true;
-		}
-	}
+
+
+//Dos
+//Isertar
+function insert(x,d,c) {
+	var x;
+	var d;
+	var c;
+	console.log('Paren Recibí esto:' + x);
+	console.log('Paren Recibí esto:' + d);
+	console.log('Paren Recibí esto:' + c);
+
+	console.log('Cheee debemos insertar esto: ' + x);
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(function queryDBDos(tx) {
+		tx.executeSql("INSERT INTO ERP_ARTICULOS (id, DESCRIPCION, COD_BARRA) VALUES ('"+ x +"', '"+ d +"', '"+ c +"') ", [], function querySuccessDos(tx, results) {
+
+			console.log('inserte con éxito: ' + results.insertId);
+			console.log('filas afectadas: ' + results.rowsAffected);
+			console.log('Cantidad rows: ' + results.rows);
+		    console.log('inserte con éxito este artículo: ' + x);
+
+		}, function errorCBDos(err) {
+			console.log("Error processing SQL: " + err.code);
+		});
+	}, function errorCBDos(err) {
+		console.log("Error processing SQL: " + err.code);
+	});
 }
 
-function errorExisteDB(){
-	console.log("Error procesando SQL:"  + err.code + '-' + err.message);
-	alert("Error procesando SQL=> "  + err.code + '-' + err.message);
+function update(x,d,c) {
+	var x;
+	var d;
+	var c;
+
+	console.log('Paren Recibí esto:' + x);
+	console.log('Paren Recibí esto:' + d);
+	console.log('Paren Recibí esto:' + c);
+
+	var db = openDatabase("ERPITRISINV", "1.0", "TomaInventario", 200000);
+	db.transaction(function queryDBTres(tx) {
+		tx.executeSql("UPDATE ERP_ARTICULOS SET DESCRIPCION = '"+ d +"', COD_BARRA = '"+ c +"' where id = '" + x + "' ", [], function querySuccessTres(tx, results) {
+			console.log('update con éxito este artículo: ' + x);
+
+		}, function errorCBTres(err) {
+			console.log("Error processing SQL: " + err.code);
+		});
+	}, function errorCBTres(err) {
+		console.log("Error processing SQL: " + err.code);
+	});
 }
+
+
+
+//Ejejcuto la función para saber si existe o no.
+//successCBUno('Leonardo17');
+
+/*
+function insert(x){
+	var x;
+	console.log('debo insertar a => ' + x);
+}
+
+function update(x){
+	var x;
+	console.log('debo updatear a =>' + x);
+}
+*/
+//tx.executeSql("UPDATE ERP_ARTICULOS SET id = 'LEO2016', DESCRIPCION = 'LEOOOOOOOOOO', COD_BARRA = '' where id = '" + Response.Data[x]["ID"] + "' ");
