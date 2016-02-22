@@ -754,7 +754,7 @@ function errorCB(err){
 
 function successCB(){
 	console.log("Dato insertado");
-	//alert('¡Excelente! ahora volvé a centralizar los precios.');	
+	window.localStorage.setItem("nuevo",0);
 	navigator.notification.alert('¡Excelente! ahora volvé a centralizar los artículos.', alertCallback, 'Centralizador dice:', 'Aceptar')
 }	
 
