@@ -700,7 +700,7 @@ function errorCB(err){
 }
 
 function alertCallback(){
-	console.log("AlertCallback");
+	console.log("navigator.notification.alert(AlertCallback)");
 }
 
 function successArt(){
