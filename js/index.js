@@ -259,8 +259,8 @@ function successIngreso(){
 
 function genInventario(){
 
-//var hayWiFi=validateConnection();
-var hayWiFi = true;
+var hayWiFi=validateConnection();
+//var hayWiFi = true;
 
 	if(hayWiFi == true) {
 	//Levanto el ID del depósito seleccionado.
@@ -603,8 +603,8 @@ function validateConnection(){
 //************* ARTICULOS *************	
 	function CargoArticulos(){
 
-		//var hayWiFi = validateConnection();
-		var hayWiFi = true;
+		var hayWiFi = validateConnection();
+		//var hayWiFi = true;
 		if(hayWiFi == true){
 			$("#leo").show();
 
@@ -1018,8 +1018,8 @@ function muestroFiltrando(){
 
 function enviarInventario(){
 
-	//var tienesWifi = validateConnection();
-	var tienesWifi = true;
+	var tienesWifi = validateConnection();
+	//var tienesWifi = true;
 
 	if(tienesWifi == true){
 			if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
