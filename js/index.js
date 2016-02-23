@@ -259,8 +259,8 @@ function successIngreso(){
 
 function genInventario(){
 
-var hayWiFi=validateConnection();
-//var hayWiFi = true;
+//var hayWiFi=validateConnection();
+var hayWiFi = true;
 
 	if(hayWiFi == true) {
 	//Levanto el ID del depósito seleccionado.
@@ -603,8 +603,8 @@ function validateConnection(){
 //************* ARTICULOS *************	
 	function CargoArticulos(){
 
-		var hayWiFi = validateConnection();
-		//var hayWiFi = true;
+		//var hayWiFi = validateConnection();
+		var hayWiFi = true;
 		if(hayWiFi == true){
 			$("#leo").show();
 
@@ -1018,8 +1018,8 @@ function muestroFiltrando(){
 
 function enviarInventario(){
 
-	var tienesWifi = validateConnection();
-	//var tienesWifi = true;
+	//var tienesWifi = validateConnection();
+	var tienesWifi = true;
 
 	if(tienesWifi == true){
 			if(confirm("¡Atención! estamos a punto de enviar a Itris toda la información que ingresaste. Una vez finalizado se borrará toda la info local. ¿Estás seguro que querés continuar?")){
@@ -1337,12 +1337,14 @@ function insert(x,d,c,r,a,f) {
 				},9000);
 				window.localStorage.setItem("fua_cli", fua);
 				window.localStorage.setItem("nuevo",1);
+				location.reload();
 			}else{
 				$("#reloader").html('<div class="progress"> ' +
 					'<div class="progress-bar" role="progressbar" aria-valuenow="' + acumulado + '" aria-valuemin="0" aria-valuemax="' + r + '" style="width: '+ parseInt(porcentaje) +'%;"> ' +
 					'' + parseInt(porcentaje) + '% Completado ' +
 					'</div> ' +
 					'</div>');
+				location.reload();
 			}
 		}, function errorCBDos(err) {
 			console.log("Error processing SQL: " + err.code);
@@ -1376,12 +1378,14 @@ function update(x,d,c,r,a,f) {
 				},9000);
 
 				window.localStorage.setItem("fua_cli", fua);
+				location.reload();
 			}else{
 				$("#reloader").html('<div class="progress"> ' +
 					'<div class="progress-bar" role="progressbar" aria-valuenow="' + acumulado + '" aria-valuemin="0" aria-valuemax="' + r + '" style="width: '+ parseInt(porcentaje) +'%;"> ' +
 					'' + parseInt(porcentaje) + '% Completado ' +
 					'</div> ' +
 					'</div>');
+				location.reload();
 			}
 
 		}, function errorCBTres(err) {
