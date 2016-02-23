@@ -1344,7 +1344,6 @@ function insert(x,d,c,r,a,f) {
 					'' + parseInt(porcentaje) + '% Completado ' +
 					'</div> ' +
 					'</div>');
-				location.reload();
 			}
 		}, function errorCBDos(err) {
 			console.log("Error processing SQL: " + err.code);
@@ -1385,7 +1384,6 @@ function update(x,d,c,r,a,f) {
 					'' + parseInt(porcentaje) + '% Completado ' +
 					'</div> ' +
 					'</div>');
-				location.reload();
 			}
 
 		}, function errorCBTres(err) {
