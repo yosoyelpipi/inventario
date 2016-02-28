@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link href='https://fonts.googleapis.com/css?family=Handlee' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="js/inicial/jquery-1.8.3.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/inicial/themes/base/jquery-ui.css">
+	<script type="text/javascript" src="js/inicial/1.9.1/jquery-ui.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="js/inicial/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="js/inicial/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="js/inicial/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<style type="text/css">
+    body {
+			font: normal normal 16px Arial;
+				  margin-right: 0%;
+	  margin-left: 0%;
+	  margin-top: 0%;
+		}
+
+	p {
+	  font-size: 40px;
+	  margin: 100px 0 0 0;
+	  font-family: Handlee;
+	}
+
+	.nodisplay {
+	  display: none;
+	}
+
+	#wrapper {
+	  margin-right: 0%;
+	  margin-left: 0%;
+	  margin-top: 0%;
+	  width: 100%;
+	  height: 100%;
+	}
+
+	.page {
+	  position: absolute;
+	  width: 100%;
+	  height: 100%;
+	  text-align: center;
+	}
+
+	#page1 {
+	  background-color: #0066AA;
+	  color: #FFFFFF;
+	  display: inline-block;
+	}
+
+	#page2 {
+	  background-color: #0066AA;
+	  color: #FFFFFF;
+	  float: left;
+	}
+
+	#page3 {
+	  background-color: #0066AA;
+	  color: #FFFFFF;
+	  float: left;
+	}
+
+	#page4 {
+	  background-color: #0066AA;
+	  color: #FFFFFF;
+	  float: left;
+	}
+    #page5 {
+        background-color: #0066AA;
+        color: #FFFFFF;
+        float: left;
+    }
+    #page6 {
+        background-color: #0066AA;
+        color: #FFFFFF;
+        float: left;
+    }
+    #page7 {
+        background-color: #0066AA;
+        color: #FFFFFF;
+        float: left;
+    }
+	</style>
+
+  <title>Page transition using jQuery UI by leocondori</title>
+
+<script type='text/javascript'>
+$(window).load(function(){
+
+    window.localStorage.setItem("ready", true);
+
+    var initial = window.localStorage.getItem("ready");
+
+    if(!initial){
+        alert('Este es conocido...');
+    }else {
+        function transitionPage() {
+            // Hide to left / show from left
+            $("#page1").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page2").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+        function transitionPage2() {
+            // Hide to left / show from left
+            $("#page2").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page3").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+        function transitionPage3() {
+            // Hide to left / show from left
+            $("#page3").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page4").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+        function transitionPage4() {
+            // Hide to left / show from left
+            $("#page4").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page5").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+        function transitionPage5() {
+            // Hide to left / show from left
+            $("#page5").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page6").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+        function transitionPage6() {
+            // Hide to left / show from left
+            $("#page6").toggle("slide", {
+                direction: "left"
+            }, 500);
+
+            // Show from right / hide to right
+            $("#page7").toggle("slide", {
+                direction: "right"
+            }, 500);
+        }
+
+    }
+
+$(document).ready(function() {
+  $('#page1').click(transitionPage);
+  $('#page2').click(transitionPage2);
+  $('#page3').click(transitionPage3);
+  $('#page4').click(transitionPage4);
+  $('#page5').click(transitionPage5);
+  $('#page6').click(transitionPage6);
+});
+
+});
+
+</script>
+
+  
+</head>
+
+<body>
+  <div id="wrapper">	
+	  <div id="page1" class="page">
+		<p>¡Hola! vamos hacer un pequeño recorrido de configuración sugerida.</p>
+		<img src="img/icon.png" class="img-responsive">
+		<p>¡Comencemos!</p>
+		<br>
+		<p><b>.</b>.......</p>
+	  </div>
+	  <div id="page2" class="page nodisplay">
+		<p>1) Ingrese los datos de conexión.</p>
+		<img src="img/A.png" class="img-responsive" width="80%">
+		<p>.<b>.</b>......</p>
+	  </div>
+	  <div id="page3" class="page nodisplay">
+		<p>2) Genera la toma de invenario para elegir un depósito.</p>
+		<img src="img/AA.png" class="img-responsive"  width="80%">
+		<p>..<b>.</b>.....</p>
+	  </div>
+	  <div id="page4" class="page nodisplay">
+		<p>3) Realice la carga inicial de artículos.</p>
+		<img src="img/B.png" class="img-responsive" width="80%">
+		<p>...<b>.</b>...</p>
+	  </div>
+	  <div id="page5" class="page nodisplay">
+		<p>4) Seleccione la forma de generar el inventario.</p>
+		<img src="img/C.png" class="img-responsive" width="80%">
+		<p>...<b>.</b>..</p>
+	  </div>
+	  <div id="page6" class="page nodisplay">
+		<p>5) Puede monitorear la cantidades ingresadas.</p>
+		<img src="img/CC.png" class="img-responsive" width="80%">
+		<p>...<b>.</b>..</p>
+	  </div>
+	  <div id="page7" class="page nodisplay">
+		<p>6) Envíe los datos a Itris</p>
+		<img src="img/D.png" class="img-responsive" width="80%">
+		<p>
+			<!--<button type="button" class="btn btn-default btn-lg">¡COMENZAR!</button>-->
+            <a class="btn btn-default btn-lg" href="index2.html" role="button">¡COMENZAR!</a>
+		</p>
+		<p>.....<b>.</b></p>
+	  </div>	  
+</div>
+  
+</body>
+
+</html>
