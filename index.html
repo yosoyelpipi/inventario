@@ -92,18 +92,6 @@
 
 <script type='text/javascript'>
 $(window).load(function(){
-    function onload() {
-        document.getElementById('touchstart').addEventListener('touchstart', hello, false);
-        document.getElementById('touchend').addEventListener('touchend', bye, false);
-    }
-
-    function hello() {
-        alert('hello');
-    }
-
-    function bye() {
-        alert('bye');
-    }
 
     window.localStorage.setItem("ready", true);
 
@@ -207,40 +195,38 @@ $(document).ready(function() {
 	  <div id="page1" class="page">
 		<p>¡Hola! vamos hacer un pequeño recorrido de configuración sugerida.</p>
 		<img src="img/icon.png" class="img-responsive">
-          <a href="#" ontouchstart="hello();return false;">Attribute: ontouchstart</a>
-          <a href="#" ontouchend="bye();return false;">Attribute: ontouchend</a>
 		<p>¡Comencemos!</p>
 		<br>
 		<p><b>.</b>.......</p>
 	  </div>
 	  <div id="page2" class="page nodisplay">
 		<p>1) Ingrese los datos de conexión.</p>
-		<img src="img/A.png" class="img-responsive">
+		<img src="img/A.png" class="img-responsive" width="80%">
 		<p>.<b>.</b>......</p>
 	  </div>
 	  <div id="page3" class="page nodisplay">
 		<p>2) Genera la toma de invenario para elegir un depósito.</p>
-		<img src="img/AA.png" class="img-responsive">
+		<img src="img/AA.png" class="img-responsive"  width="80%">
 		<p>..<b>.</b>.....</p>
 	  </div>
 	  <div id="page4" class="page nodisplay">
 		<p>3) Realice la carga inicial de artículos.</p>
-		<img src="img/B.png" class="img-responsive">
+		<img src="img/B.png" class="img-responsive" width="80%">
 		<p>...<b>.</b>...</p>
 	  </div>
 	  <div id="page5" class="page nodisplay">
 		<p>4) Seleccione la forma de generar el inventario.</p>
-		<img src="img/C.png" class="img-responsive">
+		<img src="img/C.png" class="img-responsive" width="80%">
 		<p>...<b>.</b>..</p>
 	  </div>
 	  <div id="page6" class="page nodisplay">
 		<p>5) Puede monitorear la cantidades ingresadas.</p>
-		<img src="img/CC.png" class="img-responsive">
+		<img src="img/CC.png" class="img-responsive" width="80%">
 		<p>...<b>.</b>..</p>
 	  </div>
 	  <div id="page7" class="page nodisplay">
 		<p>6) Envíe los datos a Itris</p>
-		<img src="img/D.png" class="img-responsive">
+		<img src="img/D.png" class="img-responsive" width="80%">
 		<p>
 			<!--<button type="button" class="btn btn-default btn-lg">¡COMENZAR!</button>-->
             <a class="btn btn-default btn-lg" href="index2.html" role="button">¡COMENZAR!</a>
