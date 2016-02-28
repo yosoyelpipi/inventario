@@ -92,6 +92,18 @@
 
 <script type='text/javascript'>
 $(window).load(function(){
+    function onload() {
+        document.getElementById('touchstart').addEventListener('touchstart', hello, false);
+        document.getElementById('touchend').addEventListener('touchend', bye, false);
+    }
+
+    function hello() {
+        alert('hello');
+    }
+
+    function bye() {
+        alert('bye');
+    }
 
     window.localStorage.setItem("ready", true);
 
@@ -195,6 +207,8 @@ $(document).ready(function() {
 	  <div id="page1" class="page">
 		<p>¡Hola! vamos hacer un pequeño recorrido de configuración sugerida.</p>
 		<img src="img/icon.png">
+          <a href="#" ontouchstart="hello();return false;">Attribute: ontouchstart</a>
+          <a href="#" ontouchend="bye();return false;">Attribute: ontouchend</a>
 		<p>¡Comencemos!</p>
 		<br>
 		<p><b>.</b>.......</p>
